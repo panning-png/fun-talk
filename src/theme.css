@@ -758,9 +758,28 @@ uni-page-body,
 .ft-chat-route .uni-popup,
 .ft-chat-route uni-popup,
 .ft-chat-route .uni-mask,
+.ft-chat-route .uni-modal__mask,
+.ft-chat-route .uni-modal-mask,
 .ft-chat-route .custom-modal-overlay,
 .ft-chat-route .custom-sidebar-scroll {
   z-index: 5000 !important;
+}
+
+.ft-chat-route .uni-modal,
+.ft-chat-route uni-modal {
+  z-index: 6001 !important;
+  pointer-events: auto !important;
+}
+
+.ft-chat-route .uni-modal__hd,
+.ft-chat-route .uni-modal__bd,
+.ft-chat-route .uni-modal__ft,
+.ft-chat-route .uni-modal__btn {
+  pointer-events: auto !important;
+}
+
+.ft-chat-route .uni-modal__btn_primary {
+  color: var(--ft-blue) !important;
 }
 
 :root.dark .ft-titlebar {

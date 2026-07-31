@@ -138,7 +138,11 @@ window.addEventListener('DOMContentLoaded', () => {
         '.uni-drawer__content--visible',
         '.uni-popup',
         'uni-popup',
+        '.uni-modal',
+        'uni-modal',
         '.uni-mask',
+        '.uni-modal__mask',
+        '.uni-modal-mask',
         '.custom-modal-overlay',
         '.custom-sidebar-scroll'
       ].join(','))

@@ -106,6 +106,10 @@ if (!preload.includes('ft-native-overlay-open') || !theme.includes('.uni-drawer'
   throw new Error('native menu drawer/popup must be detectable and layered above the desktop shell');
 }
 
+if (!preload.includes('.uni-modal') || !theme.includes('.ft-chat-route .uni-modal') || !theme.includes('z-index: 6001 !important')) {
+  throw new Error('uni modal must be detected and layered above native masks');
+}
+
 if (!theme.includes('.chat-end-overlay') || !theme.includes('pointer-events: none !important')) {
   throw new Error('chat end visual overlay must not block native top-left menu clicks');
 }
