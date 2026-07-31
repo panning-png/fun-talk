@@ -39,6 +39,7 @@ window.addEventListener('DOMContentLoaded', () => {
           <button data-ft-nav="reload" title="刷新">↻</button>
           <button data-ft-nav="home" title="首页">首页</button>
           <button data-ft-nav="chat" title="聊天">聊天</button>
+          <button class="ft-plugin-mini" data-ft-plugin-toggle="auto-female" title="自动匹配女生">自动女</button>
         </div>
         <div class="ft-window-controls" aria-label="窗口控制">
           <button data-ft-window="minimize" title="最小化">—</button>
@@ -67,6 +68,20 @@ window.addEventListener('DOMContentLoaded', () => {
             <div class="ft-session-title">随机匹配</div>
             <div class="ft-session-text">使用原站匹配能力</div>
           </div>
+        </div>
+        <div class="ft-plugin-card">
+          <div class="ft-plugin-head">
+            <div>
+              <div class="ft-plugin-title">插件脚本</div>
+              <div class="ft-plugin-subtitle">自动化匹配助手</div>
+            </div>
+            <button class="ft-switch" type="button" role="switch" aria-checked="false" data-ft-plugin="auto-female">
+              <span></span>
+            </button>
+          </div>
+          <div class="ft-plugin-name">自动匹配女生</div>
+          <div class="ft-plugin-desc">开启后自动匹配；遇到男生会确认离开并继续，匹配到女生后停止。</div>
+          <div class="ft-plugin-status" data-ft-plugin-status>未启用</div>
         </div>
       </section>
     `;
@@ -104,6 +119,262 @@ window.addEventListener('DOMContentLoaded', () => {
         window.funTalkClient.nav(button.getAttribute('data-ft-nav'));
       }
     });
+  };
+
+  const AUTO_MATCH_STORAGE_KEY = 'fun-talk:auto-match-female-enabled';
+  const AUTO_MATCH_MIN_ACTION_INTERVAL = 1800;
+  const AUTO_MATCH_TICK_INTERVAL = 1200;
+
+  const autoMatchRestored = window.localStorage.getItem(AUTO_MATCH_STORAGE_KEY) === '1';
+  const autoMatch = {
+    enabled: autoMatchRestored,
+    timer: null,
+    attempts: 0,
+    status: autoMatchRestored ? '已启用，准备匹配' : '未启用',
+    lastActionAt: 0,
+    currentGender: '未知'
+  };
+
+  const cleanText = (text) => String(text || '').replace(/\s+/g, ' ').trim();
+
+  const isVisibleElement = (element) => {
+    if (!element || element.closest('#fun-talk-shell')) return false;
+
+    const rect = element.getBoundingClientRect();
+    if (rect.width < 8 || rect.height < 8) return false;
+
+    const style = window.getComputedStyle(element);
+    return style.display !== 'none' && style.visibility !== 'hidden' && Number(style.opacity) !== 0;
+  };
+
+  const getVisibleText = (element) => (isVisibleElement(element) ? cleanText(element.innerText || element.textContent) : '');
+
+  const setAutoMatchStatus = (status, options = {}) => {
+    autoMatch.status = status;
+    if (options.gender) autoMatch.currentGender = options.gender;
+
+    document.querySelectorAll('[data-ft-plugin="auto-female"], [data-ft-plugin-toggle="auto-female"]').forEach((button) => {
+      button.classList.toggle('active', autoMatch.enabled);
+      button.setAttribute('aria-checked', autoMatch.enabled ? 'true' : 'false');
+    });
+
+    const statusNode = document.querySelector('[data-ft-plugin-status]');
+    if (statusNode) {
+      const genderText = autoMatch.currentGender && autoMatch.currentGender !== '未知' ? `｜当前：${autoMatch.currentGender}` : '';
+      const attemptText = autoMatch.attempts > 0 ? `｜轮次：${autoMatch.attempts}` : '';
+      statusNode.textContent = `${status}${genderText}${attemptText}`;
+      statusNode.classList.toggle('active', autoMatch.enabled);
+      statusNode.classList.toggle('done', /已匹配女生|已完成/.test(status));
+      statusNode.classList.toggle('warn', /男生|离开|等待/.test(status));
+    }
+  };
+
+  const stopAutoMatch = (status = '已停止', options = {}) => {
+    autoMatch.enabled = false;
+    window.localStorage.removeItem(AUTO_MATCH_STORAGE_KEY);
+
+    if (autoMatch.timer) {
+      window.clearTimeout(autoMatch.timer);
+      autoMatch.timer = null;
+    }
+
+    setAutoMatchStatus(status, options);
+  };
+
+  const getPartnerInfoText = () => {
+    const statusContainer = document.querySelector('.chat-status-container');
+    const statusText = getVisibleText(statusContainer);
+    if (/对方信息/.test(statusText)) return statusText;
+
+    const bodyText = cleanText(document.body && document.body.innerText);
+    const match = bodyText.match(/对方信息[:：]\s*(男生|女生)[^。提示离开发送]*/);
+    return match ? match[0] : '';
+  };
+
+  const getPartnerGender = () => {
+    const infoText = getPartnerInfoText();
+    if (/对方信息[:：]?\s*女生/.test(infoText) || /\b女生\b/.test(infoText)) return '女生';
+    if (/对方信息[:：]?\s*男生/.test(infoText) || /\b男生\b/.test(infoText)) return '男生';
+    return '未知';
+  };
+
+  const isPairedChat = () => {
+    const infoText = getPartnerInfoText();
+    const hasInput = !!document.querySelector('textarea, input, .message-input, uni-textarea, uni-input');
+    const hasLeave = !!Array.from(document.querySelectorAll('.leave-btn, button, uni-button, uni-view')).some((element) => {
+      const text = getVisibleText(element);
+      return text === '离开' || text === '离开聊天';
+    });
+
+    return /对方信息[:：]/.test(infoText) && (hasInput || hasLeave);
+  };
+
+  const getVisibleClickTargets = (pattern, options = {}) => {
+    const root = options.root || document;
+    const selectors = options.selectors || 'button, uni-button, uni-view, uni-text, div, span';
+    const matcher = pattern instanceof RegExp ? pattern : new RegExp(pattern);
+
+    return Array.from(root.querySelectorAll(selectors))
+      .map((element) => {
+        const text = getVisibleText(element);
+        if (!text || !matcher.test(text)) return null;
+
+        const rect = element.getBoundingClientRect();
+        const style = window.getComputedStyle(element);
+        if (style.pointerEvents === 'none') return null;
+
+        return {
+          element,
+          text,
+          area: rect.width * rect.height,
+          x: rect.left + rect.width / 2,
+          y: rect.top + rect.height / 2
+        };
+      })
+      .filter(Boolean)
+      .sort((a, b) => a.area - b.area);
+  };
+
+  const clickTarget = (target) => {
+    if (!target || !target.element) return false;
+
+    target.element.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, cancelable: true, clientX: target.x, clientY: target.y }));
+    target.element.dispatchEvent(new MouseEvent('mouseup', { bubbles: true, cancelable: true, clientX: target.x, clientY: target.y }));
+    target.element.click();
+    return true;
+  };
+
+  const clickVisibleText = (pattern, options) => {
+    const [target] = getVisibleClickTargets(pattern, options);
+    return clickTarget(target);
+  };
+
+  const clickStartMatch = () => clickVisibleText(/^(开始匹配|重新匹配|继续匹配|捡一个瓶子|离开聊天)$/);
+
+  const clickLeave = () => {
+    const leaveButton = Array.from(document.querySelectorAll('.leave-btn'))
+      .map((element) => ({ element, text: getVisibleText(element) }))
+      .find((item) => item.text === '离开' || item.text === '离开聊天');
+
+    if (leaveButton) {
+      const rect = leaveButton.element.getBoundingClientRect();
+      return clickTarget({
+        element: leaveButton.element,
+        text: leaveButton.text,
+        area: rect.width * rect.height,
+        x: rect.left + rect.width / 2,
+        y: rect.top + rect.height / 2
+      });
+    }
+
+    return clickVisibleText(/^(离开|离开聊天)$/);
+  };
+
+  const getLeaveModal = () => Array.from(document.querySelectorAll('.uni-modal, uni-modal')).find((element) => {
+    const text = getVisibleText(element);
+    return /确认离开|确定要结束当前聊天/.test(text);
+  });
+
+  const clickConfirmLeave = () => {
+    const modal = getLeaveModal();
+    if (!modal) return false;
+
+    const primary = Array.from(modal.querySelectorAll('.uni-modal__btn_primary, .uni-modal__btn:last-child, uni-button, button'))
+      .map((element) => {
+        const rect = element.getBoundingClientRect();
+        return { element, text: getVisibleText(element), area: rect.width * rect.height, x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+      })
+      .filter((target) => /确认离开|确定|确认/.test(target.text))
+      .sort((a, b) => a.area - b.area)[0];
+
+    if (primary) return clickTarget(primary);
+
+    return clickVisibleText(/^(确认离开|确定|确认)$/);
+  };
+
+  const scheduleAutoMatchTick = (delay = AUTO_MATCH_TICK_INTERVAL) => {
+    if (!autoMatch.enabled) return;
+    if (autoMatch.timer) window.clearTimeout(autoMatch.timer);
+    autoMatch.timer = window.setTimeout(runAutoMatchTick, delay);
+  };
+
+  const runAutoMatchTick = () => {
+    if (!autoMatch.enabled) return;
+
+    const now = Date.now();
+    if (now - autoMatch.lastActionAt < AUTO_MATCH_MIN_ACTION_INTERVAL) {
+      scheduleAutoMatchTick(AUTO_MATCH_MIN_ACTION_INTERVAL - (now - autoMatch.lastActionAt) + 100);
+      return;
+    }
+
+    const modal = getLeaveModal();
+    if (modal) {
+      autoMatch.lastActionAt = now;
+      setAutoMatchStatus('确认离开中');
+      clickConfirmLeave();
+      scheduleAutoMatchTick(1800);
+      return;
+    }
+
+    if (isPairedChat()) {
+      const gender = getPartnerGender();
+      autoMatch.currentGender = gender;
+
+      if (gender === '女生') {
+        stopAutoMatch('已匹配女生，脚本停止', { gender });
+        return;
+      }
+
+      if (gender === '男生') {
+        autoMatch.attempts += 1;
+        autoMatch.lastActionAt = now;
+        setAutoMatchStatus('匹配到男生，准备离开', { gender });
+        clickLeave();
+        scheduleAutoMatchTick(1800);
+        return;
+      }
+
+      setAutoMatchStatus('已匹配，等待识别性别', { gender });
+      scheduleAutoMatchTick(1000);
+      return;
+    }
+
+    autoMatch.lastActionAt = now;
+    setAutoMatchStatus('匹配中');
+    clickStartMatch();
+    scheduleAutoMatchTick(2600);
+  };
+
+  const startAutoMatch = () => {
+    autoMatch.enabled = true;
+    autoMatch.attempts = 0;
+    autoMatch.currentGender = getPartnerGender();
+    window.localStorage.setItem(AUTO_MATCH_STORAGE_KEY, '1');
+    setAutoMatchStatus('已启用，准备匹配');
+    scheduleAutoMatchTick(100);
+  };
+
+  const bindPluginControls = () => {
+    const buttons = document.querySelectorAll('[data-ft-plugin="auto-female"], [data-ft-plugin-toggle="auto-female"]');
+    if (!buttons.length) return;
+
+    buttons.forEach((button) => {
+      if (button.dataset.ftBound === '1') return;
+
+      button.dataset.ftBound = '1';
+      button.addEventListener('click', (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+
+        if (autoMatch.enabled) {
+          stopAutoMatch('已手动停止');
+        } else {
+          startAutoMatch();
+        }
+      });
+    });
+
+    setAutoMatchStatus(autoMatch.enabled ? autoMatch.status || '已启用' : autoMatch.status || '未启用');
   };
 
   const setViewportVars = () => {
@@ -184,9 +455,11 @@ window.addEventListener('DOMContentLoaded', () => {
   const boot = () => {
     inject();
     mountShell();
+    bindPluginControls();
     setViewportVars();
     annotatePage();
     markMessageRows();
+    setAutoMatchStatus(autoMatch.status);
   };
 
   const scheduleBoot = () => {
@@ -198,6 +471,8 @@ window.addEventListener('DOMContentLoaded', () => {
       setViewportVars();
       annotatePage();
       markMessageRows();
+      bindPluginControls();
+      setAutoMatchStatus(autoMatch.status);
     });
   };
 
@@ -269,7 +544,20 @@ window.addEventListener('DOMContentLoaded', () => {
     };
   };
 
+  window.funTalkPluginAudit = () => ({
+    autoFemaleEnabled: autoMatch.enabled,
+    autoFemaleStatus: autoMatch.status,
+    autoFemaleAttempts: autoMatch.attempts,
+    partnerInfo: getPartnerInfoText(),
+    partnerGender: getPartnerGender(),
+    paired: isPairedChat(),
+    leaveModalOpen: !!getLeaveModal()
+  });
+
   boot();
+  if (autoMatch.enabled) {
+    scheduleAutoMatchTick(800);
+  }
 
   const observer = new MutationObserver(scheduleBoot);
 

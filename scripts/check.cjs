@@ -88,6 +88,18 @@ if (!preload.includes('funTalkLayoutAudit')) {
   throw new Error('layout audit helper must be exposed for logged-in UI checks');
 }
 
+if (
+  !preload.includes('funTalkPluginAudit') ||
+  !preload.includes('AUTO_MATCH_STORAGE_KEY') ||
+  !preload.includes('getPartnerGender') ||
+  !preload.includes('clickConfirmLeave') ||
+  !preload.includes('已匹配女生，脚本停止') ||
+  !theme.includes('.ft-plugin-card') ||
+  !theme.includes('.ft-switch.active')
+) {
+  throw new Error('auto match female plugin must expose UI, automation flow, and audit state');
+}
+
 if (!theme.includes('.chat-status-container')) {
   throw new Error('partner info status panel must remain visible in chat');
 }

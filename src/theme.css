@@ -137,6 +137,12 @@ body {
   color: var(--ft-blue);
 }
 
+.ft-actions .ft-plugin-mini.active {
+  background: var(--ft-blue);
+  border-color: var(--ft-blue);
+  color: #fff;
+}
+
 .ft-window-controls {
   position: relative;
   z-index: 1;
@@ -294,6 +300,112 @@ body {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.ft-plugin-card {
+  margin: 14px;
+  padding: 14px;
+  border: 1px solid #dbe5f3;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 4px 14px rgba(31, 42, 68, 0.04);
+  color: var(--ft-text);
+}
+
+.ft-plugin-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.ft-plugin-title {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.ft-plugin-subtitle,
+.ft-plugin-desc,
+.ft-plugin-status {
+  color: var(--ft-muted);
+  font-size: 12px;
+}
+
+.ft-plugin-subtitle {
+  margin-top: 2px;
+}
+
+.ft-plugin-name {
+  margin-top: 12px;
+  color: #243044;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.ft-plugin-desc {
+  margin-top: 5px;
+  line-height: 1.45;
+}
+
+.ft-plugin-status {
+  margin-top: 10px;
+  padding: 7px 8px;
+  border-radius: 6px;
+  background: #f3f6fb;
+  border: 1px solid #e3e9f2;
+  line-height: 1.35;
+}
+
+.ft-plugin-status.active {
+  background: #eaf2ff;
+  border-color: rgba(47, 124, 246, 0.22);
+  color: #1d63d8;
+}
+
+.ft-plugin-status.done {
+  background: #e9f7ef;
+  border-color: rgba(43, 168, 99, 0.22);
+  color: #197447;
+}
+
+.ft-plugin-status.warn {
+  background: #fff7e8;
+  border-color: rgba(230, 151, 46, 0.24);
+  color: #9a640f;
+}
+
+.ft-switch {
+  width: 42px;
+  height: 24px;
+  min-width: 42px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: #c8d1df;
+  cursor: pointer;
+  position: relative;
+  flex: 0 0 auto;
+  transition: background 0.16s ease;
+}
+
+.ft-switch span {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(31, 42, 68, 0.22);
+  transition: transform 0.16s ease;
+}
+
+.ft-switch.active {
+  background: var(--ft-blue);
+}
+
+.ft-switch.active span {
+  transform: translateX(18px);
 }
 
 #app {
@@ -798,8 +910,20 @@ uni-page-body,
 }
 
 :root.dark .ft-name,
-:root.dark .ft-session-title {
+:root.dark .ft-session-title,
+:root.dark .ft-plugin-title,
+:root.dark .ft-plugin-name {
   color: #f2f3f5;
+}
+
+:root.dark .ft-plugin-card {
+  background: #292d34;
+  border-color: #3c4047;
+}
+
+:root.dark .ft-plugin-status {
+  background: #30343a;
+  border-color: #3c4047;
 }
 
 :root.dark .ft-actions button {
