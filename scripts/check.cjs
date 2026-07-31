@@ -88,6 +88,8 @@ if (
   !theme.includes('.ft-chat-route .messages-container {\n  min-height: 240px !important') ||
   !theme.includes('.ft-chat-route .messages-container > uni-view') ||
   !theme.includes('max-width: min(72%, 620px) !important') ||
+  !theme.includes('overflow-wrap: anywhere !important') ||
+  !theme.includes('text-align-last: auto !important') ||
   theme.includes('.ft-chat-route .chat-scroll-view {\n  flex: 1 1 auto !important;\n  width: 100% !important;\n  height: auto !important')
 ) {
   throw new Error('chat scroll area must fill the viewport so messages stay visible');
@@ -183,6 +185,8 @@ if (
   !androidCss.includes('.ft-android-chat-route .chat-scroll-view') ||
   !androidCss.includes('height: 100vh !important') ||
   !androidCss.includes('.ft-row-self') ||
+  !androidCss.includes('overflow-wrap: anywhere !important') ||
+  !androidCss.includes('text-align-last: auto !important') ||
   !androidCss.includes('z-index: 6001 !important') ||
   !androidCss.includes('#fun-talk-android-match-alert') ||
   !androidCss.includes('.ft-android-female-alert')

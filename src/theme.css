@@ -827,6 +827,12 @@ uni-page-body,
 .ft-chat-route .message-bubble.partner {
   display: inline-block !important;
   max-width: min(72%, 620px) !important;
+  overflow-wrap: anywhere !important;
+  word-break: break-word !important;
+  white-space: pre-wrap !important;
+  text-align: left !important;
+  text-align-last: auto !important;
+  line-height: 1.55 !important;
   background: #fff !important;
   color: #1f2329 !important;
   border-radius: 4px 8px 8px 8px !important;
@@ -838,6 +844,12 @@ uni-page-body,
 .ft-chat-route .message-bubble.self {
   display: inline-block !important;
   max-width: min(72%, 620px) !important;
+  overflow-wrap: anywhere !important;
+  word-break: break-word !important;
+  white-space: pre-wrap !important;
+  text-align: left !important;
+  text-align-last: auto !important;
+  line-height: 1.55 !important;
   background: #dcecff !important;
   color: #1f2329 !important;
   border-radius: 8px 4px 8px 8px !important;
@@ -848,11 +860,26 @@ uni-page-body,
 .ft-row-self {
   display: flex !important;
   justify-content: flex-end !important;
+  align-items: flex-start !important;
+  text-align: left !important;
 }
 
 .ft-row-partner {
   display: flex !important;
   justify-content: flex-start !important;
+  align-items: flex-start !important;
+  text-align: left !important;
+}
+
+.ft-chat-route .partner-message-bubble *,
+.ft-chat-route .message-bubble.partner *,
+.ft-chat-route .self-message-bubble *,
+.ft-chat-route .message-bubble.self * {
+  text-align: left !important;
+  text-align-last: auto !important;
+  white-space: inherit !important;
+  overflow-wrap: inherit !important;
+  word-break: inherit !important;
 }
 
 .ft-chat-route .chat-bottom-bar {

@@ -133,8 +133,12 @@ uni-page-body,
   display: inline-block !important;
   max-width: 78% !important;
   color: #1f2329 !important;
+  overflow-wrap: anywhere !important;
   word-break: break-word !important;
   white-space: pre-wrap !important;
+  text-align: left !important;
+  text-align-last: auto !important;
+  line-height: 1.55 !important;
   box-shadow: 0 1px 3px rgba(31, 42, 68, 0.05) !important;
 }
 
@@ -155,11 +159,26 @@ uni-page-body,
 .ft-row-self {
   display: flex !important;
   justify-content: flex-end !important;
+  align-items: flex-start !important;
+  text-align: left !important;
 }
 
 .ft-row-partner {
   display: flex !important;
   justify-content: flex-start !important;
+  align-items: flex-start !important;
+  text-align: left !important;
+}
+
+.ft-android-chat-route .partner-message-bubble *,
+.ft-android-chat-route .message-bubble.partner *,
+.ft-android-chat-route .self-message-bubble *,
+.ft-android-chat-route .message-bubble.self * {
+  text-align: left !important;
+  text-align-last: auto !important;
+  white-space: inherit !important;
+  overflow-wrap: inherit !important;
+  word-break: inherit !important;
 }
 
 .ft-android-chat-route .chat-bottom-bar {
