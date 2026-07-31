@@ -201,12 +201,13 @@ window.addEventListener('DOMContentLoaded', () => {
   const isPairedChat = () => {
     const infoText = getPartnerInfoText();
     const hasInput = !!document.querySelector('textarea, input, .message-input, uni-textarea, uni-input');
-    const hasLeave = !!Array.from(document.querySelectorAll('.leave-btn, button, uni-button, uni-view')).some((element) => {
+    const hasMessageBubble = !!document.querySelector('.self-message-bubble, .partner-message-bubble, .message-bubble.self, .message-bubble.partner');
+    const hasActiveLeave = !!Array.from(document.querySelectorAll('.leave-btn, button, uni-button, uni-view')).some((element) => {
       const text = getVisibleText(element);
-      return text === '离开' || text === '离开聊天';
+      return text === '离开';
     });
 
-    return /对方信息[:：]/.test(infoText) && (hasInput || hasLeave);
+    return (/对方信息[:：]/.test(infoText) || hasMessageBubble) && hasInput && hasActiveLeave;
   };
 
   const getVisibleClickTargets = (pattern, options = {}) => {
@@ -440,12 +441,12 @@ window.addEventListener('DOMContentLoaded', () => {
     const partnerBubbles = document.querySelectorAll('.partner-message-bubble, .message-bubble.partner');
 
     selfBubbles.forEach((bubble) => {
-      const row = bubble.closest('uni-view') || bubble.parentElement;
+      const row = bubble.parentElement || bubble.closest('uni-view');
       if (row) row.classList.add('ft-row-self');
     });
 
     partnerBubbles.forEach((bubble) => {
-      const row = bubble.closest('uni-view') || bubble.parentElement;
+      const row = bubble.parentElement || bubble.closest('uni-view');
       if (row) row.classList.add('ft-row-partner');
     });
   };

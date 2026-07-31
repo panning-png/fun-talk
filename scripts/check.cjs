@@ -68,6 +68,18 @@ if (!theme.includes('.ft-chat-route .chat-bottom-bar {\n  position: relative')) 
   throw new Error('chat bottom bar must stay in normal flex flow');
 }
 
+if (
+  !theme.includes('.ft-chat-route .chat-scroll-view {\n  display: block !important') ||
+  !theme.includes('height: calc(var(--ft-app-height) - var(--ft-native-nav-height)) !important') ||
+  !theme.includes('.ft-chat-route .chat-container,\n.ft-chat-route .messages-container {\n  display: block !important') ||
+  !theme.includes('.ft-chat-route .messages-container {\n  min-height: 240px !important') ||
+  !theme.includes('.ft-chat-route .messages-container > uni-view') ||
+  !theme.includes('max-width: min(72%, 620px) !important') ||
+  theme.includes('.ft-chat-route .chat-scroll-view {\n  flex: 1 1 auto !important;\n  width: 100% !important;\n  height: auto !important')
+) {
+  throw new Error('chat scroll area must fill the viewport so messages stay visible');
+}
+
 if (!theme.includes('.ft-chat-route .ft-sidebar')) {
   throw new Error('sidebar visibility must be route-scoped');
 }
@@ -92,6 +104,7 @@ if (
   !preload.includes('funTalkPluginAudit') ||
   !preload.includes('AUTO_MATCH_STORAGE_KEY') ||
   !preload.includes('getPartnerGender') ||
+  !preload.includes('hasMessageBubble') ||
   !preload.includes('clickConfirmLeave') ||
   !preload.includes('已匹配女生，脚本停止') ||
   !theme.includes('.ft-plugin-card') ||

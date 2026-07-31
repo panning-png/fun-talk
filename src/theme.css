@@ -589,13 +589,16 @@ uni-page-body,
 }
 
 .ft-chat-route .chat-scroll-view {
+  display: block !important;
   flex: 1 1 auto !important;
   width: 100% !important;
-  height: auto !important;
+  height: calc(var(--ft-app-height) - var(--ft-native-nav-height)) !important;
+  max-height: calc(var(--ft-app-height) - var(--ft-native-nav-height)) !important;
   min-height: 0 !important;
   padding: 20px 28px 96px !important;
   background: var(--ft-bg) !important;
   box-sizing: border-box !important;
+  overflow: auto !important;
 }
 
 .ft-chat-route .chat-scroll-view:has(.chat-status-container .status-dot),
@@ -613,6 +616,8 @@ uni-page-body,
 
 .ft-chat-route .chat-content-wrapper,
 .ft-chat-route .flex-1.flex.flex-col.h-full.overflow-hidden.relative {
+  height: calc(var(--ft-app-height) - var(--ft-native-nav-height)) !important;
+  flex: 1 1 auto !important;
   min-height: 0 !important;
 }
 
@@ -622,12 +627,29 @@ uni-page-body,
   min-height: 0 !important;
 }
 
+.ft-chat-route .flex-1.relative.h-full.overflow-hidden,
+.ft-chat-route .absolute.inset-0.h-full {
+  height: 100% !important;
+}
+
 .ft-chat-route .chat-container,
 .ft-chat-route .messages-container {
+  display: block !important;
   width: min(100%, 880px) !important;
   max-width: min(100%, 880px) !important;
   margin: 0 auto !important;
   background: transparent !important;
+  box-sizing: border-box !important;
+}
+
+.ft-chat-route .messages-container {
+  min-height: 240px !important;
+  padding-bottom: 28px !important;
+}
+
+.ft-chat-route .messages-container > uni-view,
+.ft-chat-route .messages-container > view {
+  width: 100% !important;
   box-sizing: border-box !important;
 }
 
@@ -689,6 +711,8 @@ uni-page-body,
 
 .ft-chat-route .partner-message-bubble,
 .ft-chat-route .message-bubble.partner {
+  display: inline-block !important;
+  max-width: min(72%, 620px) !important;
   background: #fff !important;
   color: #1f2329 !important;
   border-radius: 4px 8px 8px 8px !important;
@@ -698,6 +722,8 @@ uni-page-body,
 
 .ft-chat-route .self-message-bubble,
 .ft-chat-route .message-bubble.self {
+  display: inline-block !important;
+  max-width: min(72%, 620px) !important;
   background: #dcecff !important;
   color: #1f2329 !important;
   border-radius: 8px 4px 8px 8px !important;
@@ -706,10 +732,12 @@ uni-page-body,
 }
 
 .ft-row-self {
+  display: flex !important;
   justify-content: flex-end !important;
 }
 
 .ft-row-partner {
+  display: flex !important;
   justify-content: flex-start !important;
 }
 
