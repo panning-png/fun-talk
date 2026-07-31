@@ -119,9 +119,13 @@ if (
   !preload.includes('getPartnerGender') ||
   !preload.includes('hasMessageBubble') ||
   !preload.includes('clickConfirmLeave') ||
+  !preload.includes('triggerFemaleMatchAlert') ||
+  !preload.includes('ft-female-match-alert') ||
   !preload.includes('已匹配女生，脚本停止') ||
   !theme.includes('.ft-plugin-card') ||
-  !theme.includes('.ft-switch.active')
+  !theme.includes('.ft-switch.active') ||
+  !theme.includes('.ft-match-alert') ||
+  !theme.includes('.ft-session-badge')
 ) {
   throw new Error('auto match female plugin must expose UI, automation flow, and audit state');
 }
@@ -168,7 +172,9 @@ if (
   !androidJs.includes('setAutoFemaleEnabled') ||
   !androidJs.includes('已匹配女生，脚本停止') ||
   !androidJs.includes('clickConfirmLeave') ||
-  !androidJs.includes('FunTalkHost.postStatus')
+  !androidJs.includes('FunTalkHost.postStatus') ||
+  !androidJs.includes('triggerFemaleAlert') ||
+  !androidJs.includes('femaleMatchAlert')
 ) {
   throw new Error('Android injection script must expose auto female match automation');
 }
@@ -177,7 +183,9 @@ if (
   !androidCss.includes('.ft-android-chat-route .chat-scroll-view') ||
   !androidCss.includes('height: 100vh !important') ||
   !androidCss.includes('.ft-row-self') ||
-  !androidCss.includes('z-index: 6001 !important')
+  !androidCss.includes('z-index: 6001 !important') ||
+  !androidCss.includes('#fun-talk-android-match-alert') ||
+  !androidCss.includes('.ft-android-female-alert')
 ) {
   throw new Error('Android mobile CSS must preserve chat message visibility and modal layering');
 }

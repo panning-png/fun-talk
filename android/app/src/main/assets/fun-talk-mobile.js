@@ -4,6 +4,8 @@
   }
 
   const STORE_KEY = 'fun-talk:auto-match-female-enabled';
+  const FEMALE_ALERT_KEY = 'fun-talk:female-match-alert';
+  const FEMALE_ALERT_TEXT_KEY = 'fun-talk:female-match-alert-text';
   const TICK_INTERVAL = 1200;
   const ACTION_INTERVAL = 1800;
 
@@ -13,7 +15,9 @@
     attempts: 0,
     status: window.localStorage.getItem(STORE_KEY) === '1' ? '已启用，准备匹配' : '未启用',
     gender: '未知',
-    lastActionAt: 0
+    lastActionAt: 0,
+    femaleAlert: window.localStorage.getItem(FEMALE_ALERT_KEY) === '1',
+    femaleAlertText: window.localStorage.getItem(FEMALE_ALERT_TEXT_KEY) || '已匹配到女生，点击查看聊天'
   };
 
   const cleanText = (text) => String(text || '').replace(/\s+/g, ' ').trim();
@@ -38,12 +42,33 @@
     return panel;
   };
 
+  const mountMatchAlert = () => {
+    let alert = document.getElementById('fun-talk-android-match-alert');
+    if (!alert) {
+      alert = document.createElement('button');
+      alert.id = 'fun-talk-android-match-alert';
+      alert.type = 'button';
+      alert.innerHTML = '<span class="ft-android-match-dot"></span><span id="fun-talk-android-match-alert-text"></span>';
+      alert.addEventListener('click', () => clearFemaleAlert());
+      document.body.appendChild(alert);
+    }
+    return alert;
+  };
+
   const notifyHost = () => {
     const panel = mountPanel();
     const genderText = state.gender && state.gender !== '未知' ? `｜${state.gender}` : '';
     const attemptText = state.attempts > 0 ? `｜${state.attempts}` : '';
     panel.textContent = `${state.status}${genderText}${attemptText}`;
     panel.classList.toggle('active', state.enabled || /已匹配女生/.test(state.status));
+    document.documentElement.classList.toggle('ft-android-female-alert', state.femaleAlert);
+
+    const matchAlert = mountMatchAlert();
+    const matchAlertText = document.getElementById('fun-talk-android-match-alert-text');
+    if (matchAlertText) {
+      matchAlertText.textContent = state.femaleAlertText || '已匹配到女生，点击查看聊天';
+    }
+    matchAlert.setAttribute('aria-hidden', state.femaleAlert ? 'false' : 'true');
 
     if (window.FunTalkHost && typeof window.FunTalkHost.postStatus === 'function') {
       window.FunTalkHost.postStatus(state.status, state.gender, state.attempts, state.enabled);
@@ -53,6 +78,27 @@
   const setStatus = (status, options = {}) => {
     state.status = status;
     if (options.gender) state.gender = options.gender;
+    notifyHost();
+  };
+
+  const triggerFemaleAlert = () => {
+    const infoText = getPartnerInfoText();
+    state.femaleAlert = true;
+    state.femaleAlertText = infoText ? `已匹配到女生：${infoText.replace(/^对方信息[:：]\s*/, '')}` : '已匹配到女生，点击查看聊天';
+    window.localStorage.setItem(FEMALE_ALERT_KEY, '1');
+    window.localStorage.setItem(FEMALE_ALERT_TEXT_KEY, state.femaleAlertText);
+    notifyHost();
+
+    if (navigator.vibrate) {
+      navigator.vibrate([90, 40, 90]);
+    }
+  };
+
+  const clearFemaleAlert = () => {
+    state.femaleAlert = false;
+    state.femaleAlertText = '已匹配到女生，点击查看聊天';
+    window.localStorage.removeItem(FEMALE_ALERT_KEY);
+    window.localStorage.removeItem(FEMALE_ALERT_TEXT_KEY);
     notifyHost();
   };
 
@@ -217,6 +263,7 @@
       state.gender = gender;
 
       if (gender === '女生') {
+        triggerFemaleAlert();
         state.enabled = false;
         window.localStorage.removeItem(STORE_KEY);
         if (state.timer) window.clearTimeout(state.timer);
@@ -249,6 +296,7 @@
     state.enabled = true;
     state.attempts = 0;
     state.gender = getGender();
+    clearFemaleAlert();
     window.localStorage.setItem(STORE_KEY, '1');
     setStatus('已启用，准备匹配');
     scheduleTick(100);
@@ -259,6 +307,7 @@
     window.localStorage.removeItem(STORE_KEY);
     if (state.timer) window.clearTimeout(state.timer);
     state.timer = null;
+    if (!/已匹配女生/.test(status)) clearFemaleAlert();
     setStatus(status);
   };
 
@@ -266,6 +315,8 @@
     autoFemaleEnabled: state.enabled,
     autoFemaleStatus: state.status,
     autoFemaleAttempts: state.attempts,
+    femaleMatchAlert: state.femaleAlert,
+    femaleMatchAlertText: state.femaleAlertText,
     partnerInfo: getPartnerInfoText(),
     partnerGender: getGender(),
     paired: isPaired(),

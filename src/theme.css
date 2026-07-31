@@ -143,6 +143,13 @@ body {
   color: #fff;
 }
 
+.ft-female-match-alert .ft-actions .ft-plugin-mini {
+  background: #fff0f0;
+  border-color: #ffb7b7;
+  color: #e64848;
+  animation: ft-alert-pulse 1.2s ease-in-out infinite;
+}
+
 .ft-window-controls {
   position: relative;
   z-index: 1;
@@ -257,6 +264,7 @@ body {
 }
 
 .ft-session {
+  position: relative;
   height: 66px;
   display: flex;
   align-items: center;
@@ -264,6 +272,7 @@ body {
   padding: 0 14px;
   border-left: 3px solid transparent;
   border-bottom: 1px solid rgba(223, 229, 238, 0.72);
+  cursor: pointer;
 }
 
 .ft-session.active {
@@ -300,6 +309,111 @@ body {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.ft-session-badge {
+  display: none;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: #e64848;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 18px;
+  text-align: center;
+  box-shadow: 0 0 0 3px rgba(230, 72, 72, 0.12);
+}
+
+.ft-female-match-alert .ft-session.active {
+  background: #fff7e8;
+  border-left-color: #e64848;
+  box-shadow: inset 0 0 0 1px rgba(230, 72, 72, 0.08);
+}
+
+.ft-female-match-alert .ft-session.active .ft-session-title {
+  color: #b42318;
+}
+
+.ft-female-match-alert .ft-session.active .ft-session-text {
+  color: #d92d20;
+  font-weight: 600;
+}
+
+.ft-female-match-alert .ft-session-badge {
+  display: block;
+}
+
+.ft-match-alert {
+  position: fixed;
+  left: calc(var(--ft-app-left) + 24px);
+  right: 24px;
+  bottom: 82px;
+  z-index: 880;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: min(calc(var(--ft-app-width) - 48px), 520px);
+  min-height: 42px;
+  margin: 0 auto;
+  padding: 10px 16px;
+  border: 1px solid rgba(230, 72, 72, 0.24);
+  border-radius: 999px;
+  background: linear-gradient(135deg, #fff7e8, #fff0f0);
+  color: #b42318;
+  font-size: 14px;
+  font-weight: 700;
+  box-shadow: 0 12px 30px rgba(31, 42, 68, 0.16);
+  cursor: pointer;
+  pointer-events: auto;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(14px);
+  transition: opacity 0.18s ease, transform 0.18s ease, visibility 0.18s ease;
+  -webkit-app-region: no-drag;
+}
+
+.ft-match-alert:hover {
+  transform: translateY(10px);
+  border-color: rgba(230, 72, 72, 0.38);
+}
+
+.ft-match-alert-dot {
+  width: 9px;
+  height: 9px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: #e64848;
+  box-shadow: 0 0 0 5px rgba(230, 72, 72, 0.14);
+}
+
+.ft-female-match-alert .ft-match-alert {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+  animation: ft-bottom-alert-bounce 1.4s ease-in-out infinite;
+}
+
+@keyframes ft-alert-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(230, 72, 72, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 0 5px rgba(230, 72, 72, 0.08);
+  }
+}
+
+@keyframes ft-bottom-alert-bounce {
+  0%,
+  100% {
+    box-shadow: 0 12px 30px rgba(31, 42, 68, 0.16);
+  }
+  50% {
+    box-shadow: 0 14px 34px rgba(230, 72, 72, 0.18);
+  }
 }
 
 .ft-plugin-card {
@@ -954,6 +1068,17 @@ uni-page-body,
   border-color: #3c4047;
 }
 
+:root.dark .ft-female-match-alert .ft-session.active {
+  background: rgba(230, 72, 72, 0.16);
+  border-left-color: #ff7875;
+}
+
+:root.dark .ft-match-alert {
+  background: linear-gradient(135deg, #3a2d23, #3a2426);
+  border-color: rgba(255, 120, 117, 0.26);
+  color: #ffb4a8;
+}
+
 :root.dark .ft-actions button {
   background: #2d3137;
   border-color: #474c55;
@@ -1039,5 +1164,14 @@ uni-page-body,
   .ft-chat-route .chat-bottom-bar {
     padding-left: 12px !important;
     padding-right: 12px !important;
+  }
+
+  .ft-match-alert {
+    left: 12px;
+    right: 12px;
+    bottom: 72px;
+    width: auto;
+    max-width: none;
+    font-size: 13px;
   }
 }

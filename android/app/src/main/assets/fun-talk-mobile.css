@@ -250,3 +250,54 @@ uni-page-body,
 #fun-talk-android-panel.active {
   display: block;
 }
+
+#fun-talk-android-match-alert {
+  position: fixed;
+  left: 12px;
+  right: 12px;
+  bottom: 72px;
+  z-index: 1201;
+  min-height: 42px;
+  padding: 10px 14px;
+  border: 1px solid rgba(230, 72, 72, 0.24);
+  border-radius: 999px;
+  background: linear-gradient(135deg, #fff7e8, #fff0f0);
+  color: #b42318;
+  font-size: 14px;
+  font-weight: 700;
+  box-shadow: 0 12px 30px rgba(31, 42, 68, 0.16);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(14px);
+  transition: opacity 0.18s ease, transform 0.18s ease, visibility 0.18s ease;
+}
+
+.ft-android-match-dot {
+  width: 9px;
+  height: 9px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: #e64848;
+  box-shadow: 0 0 0 5px rgba(230, 72, 72, 0.14);
+}
+
+.ft-android-female-alert #fun-talk-android-match-alert {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+  animation: ft-android-alert-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes ft-android-alert-pulse {
+  0%,
+  100% {
+    box-shadow: 0 12px 30px rgba(31, 42, 68, 0.16);
+  }
+  50% {
+    box-shadow: 0 14px 34px rgba(230, 72, 72, 0.18);
+  }
+}

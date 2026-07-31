@@ -55,12 +55,13 @@ window.addEventListener('DOMContentLoaded', () => {
       </aside>
       <section class="ft-session-panel" aria-hidden="true">
         <div class="ft-search">搜索</div>
-        <div class="ft-session active">
+        <div class="ft-session active" data-ft-clear-alert="female-match" title="点击清除匹配提醒">
           <div class="ft-session-avatar">瓶</div>
           <div class="ft-session-meta">
             <div class="ft-session-title">匿名聊天</div>
-            <div class="ft-session-text">匹配后开始对话</div>
+            <div class="ft-session-text" data-ft-session-text>匹配后开始对话</div>
           </div>
+          <div class="ft-session-badge" data-ft-session-badge>新</div>
         </div>
         <div class="ft-session">
           <div class="ft-session-avatar muted">配</div>
@@ -84,6 +85,10 @@ window.addEventListener('DOMContentLoaded', () => {
           <div class="ft-plugin-status" data-ft-plugin-status>未启用</div>
         </div>
       </section>
+      <button class="ft-match-alert" type="button" data-ft-match-alert data-ft-clear-alert="female-match">
+        <span class="ft-match-alert-dot"></span>
+        <span data-ft-match-alert-text>已匹配到女生，点击查看聊天</span>
+      </button>
     `;
 
     document.body.prepend(shell);
@@ -100,8 +105,17 @@ window.addEventListener('DOMContentLoaded', () => {
     });
 
     shell.addEventListener('click', (event) => {
+      const alertTarget = event.target.closest('[data-ft-clear-alert]');
       const button = event.target.closest('[data-ft-nav]');
       const windowButton = event.target.closest('[data-ft-window]');
+
+      if (alertTarget) {
+        event.preventDefault();
+        event.stopPropagation();
+        clearFemaleMatchAlert();
+        return;
+      }
+
       if (!window.funTalkClient) return;
 
       if (windowButton) {
@@ -122,17 +136,22 @@ window.addEventListener('DOMContentLoaded', () => {
   };
 
   const AUTO_MATCH_STORAGE_KEY = 'fun-talk:auto-match-female-enabled';
+  const FEMALE_MATCH_ALERT_STORAGE_KEY = 'fun-talk:female-match-alert';
+  const FEMALE_MATCH_ALERT_TEXT_STORAGE_KEY = 'fun-talk:female-match-alert-text';
   const AUTO_MATCH_MIN_ACTION_INTERVAL = 1800;
   const AUTO_MATCH_TICK_INTERVAL = 1200;
 
   const autoMatchRestored = window.localStorage.getItem(AUTO_MATCH_STORAGE_KEY) === '1';
+  const femaleAlertRestored = window.localStorage.getItem(FEMALE_MATCH_ALERT_STORAGE_KEY) === '1';
   const autoMatch = {
     enabled: autoMatchRestored,
     timer: null,
     attempts: 0,
     status: autoMatchRestored ? '已启用，准备匹配' : '未启用',
     lastActionAt: 0,
-    currentGender: '未知'
+    currentGender: '未知',
+    femaleMatchAlert: femaleAlertRestored,
+    femaleMatchAlertText: window.localStorage.getItem(FEMALE_MATCH_ALERT_TEXT_STORAGE_KEY) || '已匹配到女生，点击查看聊天'
   };
 
   const cleanText = (text) => String(text || '').replace(/\s+/g, ' ').trim();
@@ -167,6 +186,51 @@ window.addEventListener('DOMContentLoaded', () => {
       statusNode.classList.toggle('done', /已匹配女生|已完成/.test(status));
       statusNode.classList.toggle('warn', /男生|离开|等待/.test(status));
     }
+
+    renderFemaleMatchAlert();
+  };
+
+  const renderFemaleMatchAlert = () => {
+    document.documentElement.classList.toggle('ft-female-match-alert', autoMatch.femaleMatchAlert);
+
+    const alertText = autoMatch.femaleMatchAlertText || '已匹配到女生，点击查看聊天';
+    const sessionText = document.querySelector('[data-ft-session-text]');
+    const alertTextNode = document.querySelector('[data-ft-match-alert-text]');
+    const alertButton = document.querySelector('[data-ft-match-alert]');
+
+    if (sessionText) {
+      sessionText.textContent = autoMatch.femaleMatchAlert ? '匹配到女生，等待你回复' : '匹配后开始对话';
+    }
+
+    if (alertTextNode) {
+      alertTextNode.textContent = alertText;
+    }
+
+    if (alertButton) {
+      alertButton.setAttribute('aria-hidden', autoMatch.femaleMatchAlert ? 'false' : 'true');
+      alertButton.title = alertText;
+    }
+  };
+
+  const triggerFemaleMatchAlert = () => {
+    const infoText = getPartnerInfoText();
+    autoMatch.femaleMatchAlert = true;
+    autoMatch.femaleMatchAlertText = infoText ? `已匹配到女生：${infoText.replace(/^对方信息[:：]\s*/, '')}` : '已匹配到女生，点击查看聊天';
+    window.localStorage.setItem(FEMALE_MATCH_ALERT_STORAGE_KEY, '1');
+    window.localStorage.setItem(FEMALE_MATCH_ALERT_TEXT_STORAGE_KEY, autoMatch.femaleMatchAlertText);
+    renderFemaleMatchAlert();
+
+    if (navigator.vibrate) {
+      navigator.vibrate([90, 40, 90]);
+    }
+  };
+
+  const clearFemaleMatchAlert = () => {
+    autoMatch.femaleMatchAlert = false;
+    autoMatch.femaleMatchAlertText = '已匹配到女生，点击查看聊天';
+    window.localStorage.removeItem(FEMALE_MATCH_ALERT_STORAGE_KEY);
+    window.localStorage.removeItem(FEMALE_MATCH_ALERT_TEXT_STORAGE_KEY);
+    renderFemaleMatchAlert();
   };
 
   const stopAutoMatch = (status = '已停止', options = {}) => {
@@ -176,6 +240,10 @@ window.addEventListener('DOMContentLoaded', () => {
     if (autoMatch.timer) {
       window.clearTimeout(autoMatch.timer);
       autoMatch.timer = null;
+    }
+
+    if (!options.keepFemaleAlert && !/已匹配女生/.test(status)) {
+      clearFemaleMatchAlert();
     }
 
     setAutoMatchStatus(status, options);
@@ -322,7 +390,8 @@ window.addEventListener('DOMContentLoaded', () => {
       autoMatch.currentGender = gender;
 
       if (gender === '女生') {
-        stopAutoMatch('已匹配女生，脚本停止', { gender });
+        triggerFemaleMatchAlert();
+        stopAutoMatch('已匹配女生，脚本停止', { gender, keepFemaleAlert: true });
         return;
       }
 
@@ -350,6 +419,7 @@ window.addEventListener('DOMContentLoaded', () => {
     autoMatch.enabled = true;
     autoMatch.attempts = 0;
     autoMatch.currentGender = getPartnerGender();
+    clearFemaleMatchAlert();
     window.localStorage.setItem(AUTO_MATCH_STORAGE_KEY, '1');
     setAutoMatchStatus('已启用，准备匹配');
     scheduleAutoMatchTick(100);
@@ -474,6 +544,7 @@ window.addEventListener('DOMContentLoaded', () => {
       markMessageRows();
       bindPluginControls();
       setAutoMatchStatus(autoMatch.status);
+      renderFemaleMatchAlert();
     });
   };
 
@@ -549,6 +620,8 @@ window.addEventListener('DOMContentLoaded', () => {
     autoFemaleEnabled: autoMatch.enabled,
     autoFemaleStatus: autoMatch.status,
     autoFemaleAttempts: autoMatch.attempts,
+    femaleMatchAlert: autoMatch.femaleMatchAlert,
+    femaleMatchAlertText: autoMatch.femaleMatchAlertText,
     partnerInfo: getPartnerInfoText(),
     partnerGender: getPartnerGender(),
     paired: isPairedChat(),
