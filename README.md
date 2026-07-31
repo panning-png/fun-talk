@@ -91,6 +91,8 @@ npm run check
 ```text
 fun-talk/
   package.json
+  android/          # Android WebView APK 工程骨架
+  docs/             # 迁移和方案文档
   src/
     main.cjs       # Electron 主进程：窗口、导航、外链处理
     preload.cjs    # 向目标站注入客户端 UI 和样式
@@ -112,6 +114,8 @@ fun-talk/
 ## 移动端方案记录
 
 当前 Fun Talk 的核心形态是“桌面客户端外壳 + WebView/Electron 加载原站 + 注入 CSS/JS 增强 UI 与自动化能力”。如果后续要做 Android 或 iOS，不建议重写原站聊天协议，优先沿用 WebView 注入方案。
+
+详细 Android APK 技术方案见 [docs/android-apk-technical-plan.md](docs/android-apk-technical-plan.md)。当前 Android 工程骨架位于 [android/](android/)。
 
 ### 目标判断
 

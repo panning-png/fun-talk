@@ -1,6 +1,11 @@
 node_modules/
 dist/
 out/
+android/.gradle/
+android/build/
+android/app/build/
+*.apk
+*.aab
 *.log
 .DS_Store
 npm-debug.log*

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Fun Talk</string>
+    <string name="target_chat_url">https://pingzishuo.com/#/chat</string>
+    <string name="target_home_url">https://pingzishuo.com/#/</string>
+</resources>
