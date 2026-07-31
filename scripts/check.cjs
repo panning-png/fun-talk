@@ -52,6 +52,10 @@ if (!theme.includes('--ft-app-left')) {
   throw new Error('Missing app viewport offset variable');
 }
 
+if (!theme.includes('--ft-viewport-width') || !theme.includes('--ft-app-height')) {
+  throw new Error('Missing resize-safe viewport variables');
+}
+
 if (!theme.includes('#app {\n  position: fixed')) {
   throw new Error('#app must be the only fixed app viewport');
 }
@@ -91,9 +95,11 @@ if (!theme.includes('.chat-status-container')) {
 if (
   !preload.includes('requestAnimationFrame') ||
   !preload.includes("attributeFilter: ['class', 'hidden']") ||
-  preload.includes("attributeFilter: ['class', 'style', 'hidden']")
+  preload.includes("attributeFilter: ['class', 'style', 'hidden']") ||
+  !preload.includes('repairAfterResize') ||
+  !preload.includes("ipcRenderer.on('fun-talk:host-resize'")
 ) {
-  throw new Error('DOM observer must be debounced and must not watch high-frequency style mutations');
+  throw new Error('DOM observer must be debounced and resize repair must be wired');
 }
 
 if (!preload.includes('ft-native-overlay-open') || !theme.includes('.uni-drawer')) {

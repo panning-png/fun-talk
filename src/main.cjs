@@ -127,6 +127,17 @@ function createWindow() {
     }
   });
 
+  const notifyRendererResize = () => {
+    if (!win.isDestroyed() && !win.webContents.isDestroyed()) {
+      win.webContents.send('fun-talk:host-resize');
+    }
+  };
+
+  win.on('resize', notifyRendererResize);
+  win.on('maximize', notifyRendererResize);
+  win.on('unmaximize', notifyRendererResize);
+  win.on('restore', notifyRendererResize);
+
   win.on('closed', () => {
     if (mainWindow === win) mainWindow = null;
   });

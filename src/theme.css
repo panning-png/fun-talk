@@ -3,8 +3,11 @@
   --ft-native-nav-height: 44px;
   --ft-sidebar-width: 68px;
   --ft-session-width: 270px;
+  --ft-viewport-width: 100vw;
+  --ft-viewport-height: 100vh;
   --ft-app-left: 0px;
-  --ft-app-width: 100vw;
+  --ft-app-width: var(--ft-viewport-width);
+  --ft-app-height: calc(var(--ft-viewport-height) - var(--ft-titlebar-height));
   --ft-bg: #f4f6fa;
   --ft-panel: #ffffff;
   --ft-rail: #1f2633;
@@ -19,14 +22,15 @@
 
 .ft-chat-route {
   --ft-app-left: calc(var(--ft-sidebar-width) + var(--ft-session-width));
-  --ft-app-width: calc(100vw - var(--ft-sidebar-width) - var(--ft-session-width));
+  --ft-app-width: calc(var(--ft-viewport-width) - var(--ft-sidebar-width) - var(--ft-session-width));
+  --ft-app-height: calc(var(--ft-viewport-height) - var(--ft-titlebar-height));
 }
 
 html,
 body {
   background: var(--ft-bg) !important;
-  width: 100vw !important;
-  height: 100vh !important;
+  width: var(--ft-viewport-width) !important;
+  height: var(--ft-viewport-height) !important;
   overflow: hidden !important;
 }
 
@@ -38,6 +42,8 @@ body {
 #fun-talk-shell {
   position: fixed;
   inset: 0;
+  width: var(--ft-viewport-width);
+  height: var(--ft-viewport-height);
   z-index: 900;
   pointer-events: none;
   color: var(--ft-text);
@@ -295,7 +301,7 @@ body {
   top: var(--ft-titlebar-height) !important;
   left: var(--ft-app-left) !important;
   width: var(--ft-app-width) !important;
-  height: calc(100vh - var(--ft-titlebar-height)) !important;
+  height: var(--ft-app-height) !important;
   min-height: 0 !important;
   max-width: none !important;
   background: var(--ft-bg) !important;
@@ -727,7 +733,7 @@ uni-page-body,
   right: auto !important;
   bottom: 0 !important;
   width: var(--ft-app-width) !important;
-  height: calc(100vh - var(--ft-titlebar-height)) !important;
+  height: var(--ft-app-height) !important;
   z-index: 5000 !important;
   pointer-events: auto !important;
   transform: none !important;
@@ -824,8 +830,10 @@ uni-page-body,
     --ft-session-width: 0px;
   }
 
+  .ft-chat-route .ft-session-panel,
   .ft-session-panel {
-    display: none;
+    display: none !important;
+    border-right: 0 !important;
   }
 }
 
@@ -835,10 +843,12 @@ uni-page-body,
     --ft-sidebar-width: 0px;
   }
 
+  .ft-chat-route .ft-sidebar,
+  .ft-chat-route .ft-session-panel,
   .ft-sidebar,
   .ft-session-panel,
   .ft-subtitle {
-    display: none;
+    display: none !important;
   }
 
   .ft-brand {

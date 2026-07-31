@@ -106,6 +106,14 @@ window.addEventListener('DOMContentLoaded', () => {
     });
   };
 
+  const setViewportVars = () => {
+    const width = Math.max(1, Math.round(window.innerWidth || document.documentElement.clientWidth || 1));
+    const height = Math.max(1, Math.round(window.innerHeight || document.documentElement.clientHeight || 1));
+
+    document.documentElement.style.setProperty('--ft-viewport-width', `${width}px`);
+    document.documentElement.style.setProperty('--ft-viewport-height', `${height}px`);
+  };
+
   const annotatePage = () => {
     const hash = window.location.hash || '';
     const hasChatDom =
@@ -172,6 +180,7 @@ window.addEventListener('DOMContentLoaded', () => {
   const boot = () => {
     inject();
     mountShell();
+    setViewportVars();
     annotatePage();
     markMessageRows();
   };
@@ -182,9 +191,43 @@ window.addEventListener('DOMContentLoaded', () => {
     bootScheduled = true;
     window.requestAnimationFrame(() => {
       bootScheduled = false;
+      setViewportVars();
       annotatePage();
       markMessageRows();
     });
+  };
+
+  let resizeRepairTimers = [];
+  let isResizeRepairDispatch = false;
+
+  const repairAfterResize = () => {
+    if (isResizeRepairDispatch) return;
+
+    setViewportVars();
+    scheduleBoot();
+
+    resizeRepairTimers.forEach((timer) => window.clearTimeout(timer));
+    resizeRepairTimers = [];
+
+    for (const delay of [0, 80, 180, 360]) {
+      const timer = window.setTimeout(() => {
+        setViewportVars();
+        annotatePage();
+        markMessageRows();
+        isResizeRepairDispatch = true;
+        window.dispatchEvent(new Event('resize'));
+        isResizeRepairDispatch = false;
+        document.querySelectorAll('.chat-scroll-view, .uni-scroll-view, uni-scroll-view').forEach((element) => {
+          element.dispatchEvent(new Event('scroll', { bubbles: true }));
+        });
+      }, delay);
+      resizeRepairTimers.push(timer);
+    }
+
+    const cleanupTimer = window.setTimeout(() => {
+      resizeRepairTimers = [];
+    }, 420);
+    resizeRepairTimers.push(cleanupTimer);
   };
 
   window.funTalkLayoutAudit = () => {
@@ -203,6 +246,10 @@ window.addEventListener('DOMContentLoaded', () => {
     return {
       href: location.href,
       hash: location.hash,
+      viewport: {
+        width: Math.round(window.innerWidth || 0),
+        height: Math.round(window.innerHeight || 0)
+      },
       isChatRoute: document.documentElement.classList.contains('ft-chat-route'),
       hasChatDom: !!document.querySelector('.chat-scroll-view, .chat-bottom-bar, .messages-container, .message-input'),
       app: rectOf('#app'),
@@ -231,4 +278,11 @@ window.addEventListener('DOMContentLoaded', () => {
 
   window.addEventListener('hashchange', scheduleBoot);
   window.addEventListener('click', () => window.setTimeout(scheduleBoot, 80), true);
+  window.addEventListener('resize', repairAfterResize);
+  window.addEventListener('orientationchange', repairAfterResize);
+  window.addEventListener('pageshow', repairAfterResize);
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', repairAfterResize);
+  }
+  ipcRenderer.on('fun-talk:host-resize', repairAfterResize);
 });
