@@ -3,6 +3,7 @@ const { contextBridge, ipcRenderer } = require('electron');
 contextBridge.exposeInMainWorld('funTalkClient', {
   nav: (action) => ipcRenderer.invoke('fun-talk:nav', action),
   windowAction: (action) => ipcRenderer.send('fun-talk:window-control', action),
+  attention: (payload) => ipcRenderer.send('fun-talk:attention', payload),
   minimize: () => ipcRenderer.send('fun-talk:window-control', 'minimize'),
   maximize: () => ipcRenderer.send('fun-talk:window-control', 'maximize'),
   close: () => ipcRenderer.send('fun-talk:window-control', 'close')
@@ -219,6 +220,7 @@ window.addEventListener('DOMContentLoaded', () => {
     window.localStorage.setItem(FEMALE_MATCH_ALERT_STORAGE_KEY, '1');
     window.localStorage.setItem(FEMALE_MATCH_ALERT_TEXT_STORAGE_KEY, autoMatch.femaleMatchAlertText);
     renderFemaleMatchAlert();
+    ipcRenderer.send('fun-talk:attention', { type: 'female-match', active: true });
 
     if (navigator.vibrate) {
       navigator.vibrate([90, 40, 90]);
@@ -231,6 +233,7 @@ window.addEventListener('DOMContentLoaded', () => {
     window.localStorage.removeItem(FEMALE_MATCH_ALERT_STORAGE_KEY);
     window.localStorage.removeItem(FEMALE_MATCH_ALERT_TEXT_STORAGE_KEY);
     renderFemaleMatchAlert();
+    ipcRenderer.send('fun-talk:attention', { type: 'female-match', active: false });
   };
 
   const stopAutoMatch = (status = '已停止', options = {}) => {
@@ -651,4 +654,9 @@ window.addEventListener('DOMContentLoaded', () => {
     window.visualViewport.addEventListener('resize', repairAfterResize);
   }
   ipcRenderer.on('fun-talk:host-resize', repairAfterResize);
+  ipcRenderer.on('fun-talk:attention-cleared', (_event, payload) => {
+    if (payload && payload.type === 'female-match') {
+      clearFemaleMatchAlert();
+    }
+  });
 });

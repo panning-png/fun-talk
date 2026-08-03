@@ -8,6 +8,7 @@ const SETTINGS_URL = 'https://pingzishuo.com/#/settings';
 
 const isDev = process.argv.includes('--dev');
 let mainWindow = null;
+let taskbarAttentionActive = false;
 
 app.disableHardwareAcceleration();
 app.commandLine.appendSwitch('disable-gpu');
@@ -78,6 +79,25 @@ ipcMain.on('fun-talk:window-control', (event, action) => {
   applyWindowAction(event, action);
 });
 
+function setTaskbarAttention(win, active) {
+  if (!win || win.isDestroyed()) return;
+
+  taskbarAttentionActive = Boolean(active);
+  win.flashFrame(taskbarAttentionActive);
+
+  if (taskbarAttentionActive && win.isMinimized()) {
+    win.setSkipTaskbar(false);
+  }
+}
+
+ipcMain.on('fun-talk:attention', (event, payload) => {
+  const win = BrowserWindow.fromWebContents(event.sender) || mainWindow;
+  if (!win || win.isDestroyed()) return;
+
+  if (!payload || payload.type !== 'female-match') return;
+  setTaskbarAttention(win, Boolean(payload.active));
+});
+
 function createWindow() {
   const win = new BrowserWindow({
     width: 1240,
@@ -137,6 +157,14 @@ function createWindow() {
   win.on('maximize', notifyRendererResize);
   win.on('unmaximize', notifyRendererResize);
   win.on('restore', notifyRendererResize);
+  win.on('focus', () => {
+    if (taskbarAttentionActive) {
+      setTaskbarAttention(win, false);
+      if (!win.webContents.isDestroyed()) {
+        win.webContents.send('fun-talk:attention-cleared', { type: 'female-match' });
+      }
+    }
+  });
 
   win.on('closed', () => {
     if (mainWindow === win) mainWindow = null;

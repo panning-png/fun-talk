@@ -47,6 +47,16 @@ if (
   throw new Error('window minimize controls must be wired from preload to main process');
 }
 
+if (
+  !main.includes("ipcMain.on('fun-talk:attention'") ||
+  !main.includes('flashFrame') ||
+  !main.includes('fun-talk:attention-cleared') ||
+  !preload.includes("ipcRenderer.send('fun-talk:attention'") ||
+  !preload.includes("ipcRenderer.on('fun-talk:attention-cleared'")
+) {
+  throw new Error('female match alert must trigger and clear desktop taskbar attention');
+}
+
 if (!theme.includes('--ft-blue: #2f7cf6') || !theme.includes('.ft-window-controls') || !theme.includes('.ft-chat-route [class*="bg-red"]')) {
   throw new Error('enterprise-style blue gray shell and window controls must be present');
 }
