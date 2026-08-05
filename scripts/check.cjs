@@ -42,9 +42,12 @@ if (
   !main.includes("ipcMain.handle('fun-talk:window'") ||
   !main.includes("ipcMain.on('fun-talk:window-control'") ||
   !preload.includes("ipcRenderer.send('fun-talk:window-control'") ||
+  !preload.includes("ipcRenderer.send('fun-talk:window-control', windowButton.getAttribute('data-ft-window'))") ||
+  !preload.includes("ipcRenderer.invoke('fun-talk:nav', button.getAttribute('data-ft-nav'))") ||
+  preload.includes('if (!window.funTalkClient) return;') ||
   !preload.includes('data-ft-window="minimize"')
 ) {
-  throw new Error('window minimize controls must be wired from preload to main process');
+  throw new Error('shell controls must send IPC directly from the isolated preload world');
 }
 
 if (
@@ -126,6 +129,21 @@ if (!preload.includes('funTalkLayoutAudit')) {
 }
 
 if (
+  !preload.includes('THEME_STORAGE_KEY') ||
+  !preload.includes("DEFAULT_THEME_ID = 'powershell'") ||
+  !preload.includes('data-ft-theme-select') ||
+  !preload.includes("id: 'vscode'") ||
+  !preload.includes('applyTheme') ||
+  !preload.includes('funTalkThemeAudit') ||
+  !theme.includes(':root[data-ft-theme="powershell"]') ||
+  !theme.includes(':root[data-ft-theme="vscode"]') ||
+  !theme.includes('.ft-skin-panel') ||
+  !theme.includes('font-family: Consolas')
+) {
+  throw new Error('theme registry, persistence, selector, audit, and desktop skins must be present');
+}
+
+if (
   !preload.includes('funTalkPluginAudit') ||
   !preload.includes('AUTO_MATCH_STORAGE_KEY') ||
   !preload.includes('getPartnerGender') ||
@@ -136,10 +154,17 @@ if (
   !preload.includes('已匹配女生，脚本停止') ||
   !theme.includes('.ft-plugin-card') ||
   !theme.includes('.ft-switch.active') ||
-  !theme.includes('.ft-match-alert') ||
   !theme.includes('.ft-session-badge')
 ) {
   throw new Error('auto match female plugin must expose UI, automation flow, and audit state');
+}
+
+if (
+  preload.includes('data-ft-match-alert') ||
+  theme.includes('.ft-match-alert') ||
+  theme.includes('ft-bottom-alert-bounce')
+) {
+  throw new Error('female match alert must not render a floating prompt over the chat area');
 }
 
 if (!theme.includes('.chat-status-container')) {

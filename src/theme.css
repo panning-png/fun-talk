@@ -107,6 +107,10 @@ body {
   line-height: 14px;
 }
 
+.ft-theme-command {
+  display: none;
+}
+
 .ft-actions {
   position: relative;
   z-index: 1;
@@ -345,57 +349,6 @@ body {
   display: block;
 }
 
-.ft-match-alert {
-  position: fixed;
-  left: calc(var(--ft-app-left) + 24px);
-  right: 24px;
-  bottom: 82px;
-  z-index: 880;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  width: min(calc(var(--ft-app-width) - 48px), 520px);
-  min-height: 42px;
-  margin: 0 auto;
-  padding: 10px 16px;
-  border: 1px solid rgba(230, 72, 72, 0.24);
-  border-radius: 999px;
-  background: linear-gradient(135deg, #fff7e8, #fff0f0);
-  color: #b42318;
-  font-size: 14px;
-  font-weight: 700;
-  box-shadow: 0 12px 30px rgba(31, 42, 68, 0.16);
-  cursor: pointer;
-  pointer-events: auto;
-  opacity: 0;
-  visibility: hidden;
-  transform: translateY(14px);
-  transition: opacity 0.18s ease, transform 0.18s ease, visibility 0.18s ease;
-  -webkit-app-region: no-drag;
-}
-
-.ft-match-alert:hover {
-  transform: translateY(10px);
-  border-color: rgba(230, 72, 72, 0.38);
-}
-
-.ft-match-alert-dot {
-  width: 9px;
-  height: 9px;
-  flex: 0 0 auto;
-  border-radius: 50%;
-  background: #e64848;
-  box-shadow: 0 0 0 5px rgba(230, 72, 72, 0.14);
-}
-
-.ft-female-match-alert .ft-match-alert {
-  opacity: 1;
-  visibility: visible;
-  transform: translateY(0);
-  animation: ft-bottom-alert-bounce 1.4s ease-in-out infinite;
-}
-
 @keyframes ft-alert-pulse {
   0%,
   100% {
@@ -403,16 +356,6 @@ body {
   }
   50% {
     box-shadow: 0 0 0 5px rgba(230, 72, 72, 0.08);
-  }
-}
-
-@keyframes ft-bottom-alert-bounce {
-  0%,
-  100% {
-    box-shadow: 0 12px 30px rgba(31, 42, 68, 0.16);
-  }
-  50% {
-    box-shadow: 0 14px 34px rgba(230, 72, 72, 0.18);
   }
 }
 
@@ -520,6 +463,61 @@ body {
 
 .ft-switch.active span {
   transform: translateX(18px);
+}
+
+.ft-skin-panel {
+  margin: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--ft-line);
+  color: var(--ft-text);
+}
+
+.ft-skin-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 8px;
+  font-size: 12px;
+}
+
+.ft-skin-heading label {
+  font-weight: 700;
+}
+
+.ft-skin-heading span {
+  color: var(--ft-muted);
+}
+
+.ft-skin-select-wrap {
+  height: 34px;
+  display: flex;
+  align-items: center;
+  border: 1px solid #d8e0ec;
+  border-radius: 4px;
+  background: #fff;
+  overflow: hidden;
+}
+
+.ft-skin-prompt {
+  padding-left: 9px;
+  color: var(--ft-blue);
+  font-family: Consolas, "Cascadia Mono", monospace;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.ft-skin-select-wrap select {
+  min-width: 0;
+  flex: 1;
+  height: 100%;
+  padding: 0 8px;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--ft-text);
+  font: inherit;
+  cursor: pointer;
 }
 
 #app {
@@ -1100,12 +1098,6 @@ uni-page-body,
   border-left-color: #ff7875;
 }
 
-:root.dark .ft-match-alert {
-  background: linear-gradient(135deg, #3a2d23, #3a2426);
-  border-color: rgba(255, 120, 117, 0.26);
-  color: #ffb4a8;
-}
-
 :root.dark .ft-actions button {
   background: #2d3137;
   border-color: #474c55;
@@ -1146,6 +1138,915 @@ uni-page-body,
   background: rgba(7, 193, 96, 0.12) !important;
   border-color: rgba(7, 193, 96, 0.22) !important;
   color: #95ec69 !important;
+}
+
+/* PowerShell skin */
+:root[data-ft-theme="powershell"] {
+  --ft-bg: #012456;
+  --ft-panel: #071b2f;
+  --ft-rail: #151515;
+  --ft-line: #315b7c;
+  --ft-text: #f2f2f2;
+  --ft-muted: #9cc2dc;
+  --ft-green: #7fdbca;
+  --ft-blue: #56d4ff;
+  --ft-blue-soft: #103b5f;
+  --ft-sidebar-active: #56d4ff;
+}
+
+:root[data-ft-theme="powershell"] body,
+:root[data-ft-theme="powershell"] #fun-talk-shell,
+:root[data-ft-theme="powershell"] #app,
+:root[data-ft-theme="powershell"] #app * {
+  font-family: Consolas, "Cascadia Mono", "Courier New", "Microsoft YaHei UI", monospace !important;
+  letter-spacing: 0;
+}
+
+:root[data-ft-theme="powershell"] .ft-titlebar {
+  background: #181818;
+  border-bottom-color: #3f3f3f;
+  backdrop-filter: none;
+}
+
+:root[data-ft-theme="powershell"] .ft-brand {
+  align-self: stretch;
+  gap: 0;
+  margin-left: 0;
+  padding: 0 18px 0 12px;
+  background: #012456;
+  border-top: 2px solid #56d4ff;
+  border-right: 1px solid #3f3f3f;
+}
+
+:root[data-ft-theme="powershell"] .ft-logo {
+  width: 24px;
+  height: 24px;
+  margin-right: 9px;
+  border-radius: 2px;
+  background: #56d4ff;
+  color: #012456;
+  font-size: 0;
+}
+
+:root[data-ft-theme="powershell"] .ft-logo::before {
+  content: ">_";
+  font-size: 12px;
+  font-weight: 700;
+}
+
+:root[data-ft-theme="powershell"] .ft-name,
+:root[data-ft-theme="powershell"] .ft-subtitle {
+  display: none;
+}
+
+:root[data-ft-theme="powershell"] .ft-theme-command {
+  display: block;
+  color: #f2f2f2;
+  font-size: 12px;
+  line-height: 46px;
+  white-space: nowrap;
+}
+
+:root[data-ft-theme="powershell"] .ft-actions button,
+:root[data-ft-theme="powershell"] .ft-window-controls button {
+  border-color: transparent;
+  border-radius: 0;
+  background: transparent;
+  color: #d6d6d6;
+}
+
+:root[data-ft-theme="powershell"] .ft-actions button:hover,
+:root[data-ft-theme="powershell"] .ft-window-controls button:hover {
+  background: #333333;
+  border-color: #4c4c4c;
+  color: #ffffff;
+}
+
+:root[data-ft-theme="powershell"] .ft-actions .ft-plugin-mini.active {
+  background: #0e639c;
+  border-color: #56d4ff;
+  color: #ffffff;
+}
+
+:root[data-ft-theme="powershell"] .ft-sidebar {
+  background: #151515;
+  border-right-color: #3f3f3f;
+}
+
+:root[data-ft-theme="powershell"] .ft-avatar {
+  border: 1px solid #56d4ff;
+  border-radius: 2px;
+  background: transparent;
+  color: #56d4ff;
+}
+
+:root[data-ft-theme="powershell"] .ft-nav {
+  border-left: 2px solid transparent;
+  border-radius: 0;
+  color: #a8a8a8;
+  font-size: 0;
+}
+
+:root[data-ft-theme="powershell"] .ft-nav::before {
+  content: attr(data-ft-glyph);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+:root[data-ft-theme="powershell"] .ft-nav.active,
+:root[data-ft-theme="powershell"] .ft-nav:hover {
+  background: #252526;
+  border-left-color: #56d4ff;
+  color: #ffffff;
+}
+
+:root[data-ft-theme="powershell"] .ft-session-panel {
+  background: #071b2f;
+  border-right-color: #315b7c;
+}
+
+:root[data-ft-theme="powershell"] .ft-search {
+  border: 1px solid #315b7c;
+  border-radius: 0;
+  background: #012456;
+  color: #9cc2dc;
+}
+
+:root[data-ft-theme="powershell"] .ft-search::before {
+  content: "PS> ";
+  margin-right: 6px;
+  color: #56d4ff;
+}
+
+:root[data-ft-theme="powershell"] .ft-session {
+  border-bottom-color: #173b59;
+}
+
+:root[data-ft-theme="powershell"] .ft-session.active {
+  background: #103b5f;
+  border-left-color: #56d4ff;
+}
+
+:root[data-ft-theme="powershell"] .ft-session-avatar {
+  border: 1px solid #56d4ff;
+  border-radius: 2px;
+  background: #012456;
+  color: #56d4ff;
+}
+
+:root[data-ft-theme="powershell"] .ft-session-avatar.muted {
+  border-color: #6f8ca3;
+  background: #162b3d;
+  color: #b4c7d6;
+}
+
+:root[data-ft-theme="powershell"] .ft-session-title,
+:root[data-ft-theme="powershell"] .ft-plugin-title,
+:root[data-ft-theme="powershell"] .ft-plugin-name,
+:root[data-ft-theme="powershell"] .ft-skin-panel {
+  color: #f2f2f2;
+}
+
+:root[data-ft-theme="powershell"] .ft-plugin-card {
+  border-color: #315b7c;
+  border-radius: 0;
+  background: #012456;
+  box-shadow: none;
+}
+
+:root[data-ft-theme="powershell"] .ft-plugin-status {
+  border-color: #315b7c;
+  border-radius: 0;
+  background: #071b2f;
+  color: #9cc2dc;
+}
+
+:root[data-ft-theme="powershell"] .ft-plugin-status::before {
+  content: "> ";
+  color: #56d4ff;
+}
+
+:root[data-ft-theme="powershell"] .ft-plugin-status.active {
+  border-color: #56d4ff;
+  background: #103b5f;
+  color: #7fdbca;
+}
+
+:root[data-ft-theme="powershell"] .ft-switch {
+  border: 1px solid #6f8ca3;
+  border-radius: 2px;
+  background: #172c3e;
+}
+
+:root[data-ft-theme="powershell"] .ft-switch span {
+  border-radius: 1px;
+  background: #b4c7d6;
+  box-shadow: none;
+}
+
+:root[data-ft-theme="powershell"] .ft-switch.active {
+  border-color: #56d4ff;
+  background: #0e639c;
+}
+
+:root[data-ft-theme="powershell"] .ft-skin-panel {
+  border-top-color: #315b7c;
+}
+
+:root[data-ft-theme="powershell"] .ft-skin-heading span,
+:root[data-ft-theme="powershell"] .ft-plugin-subtitle,
+:root[data-ft-theme="powershell"] .ft-plugin-desc,
+:root[data-ft-theme="powershell"] .ft-session-text {
+  color: #9cc2dc;
+}
+
+:root[data-ft-theme="powershell"] .ft-skin-select-wrap {
+  border-color: #56d4ff;
+  border-radius: 0;
+  background: #012456;
+}
+
+:root[data-ft-theme="powershell"] .ft-skin-select-wrap select {
+  color: #f2f2f2;
+}
+
+:root[data-ft-theme="powershell"] .ft-skin-select-wrap option {
+  background: #012456;
+  color: #f2f2f2;
+}
+
+:root[data-ft-theme="powershell"] #app,
+:root[data-ft-theme="powershell"] uni-page-body,
+:root[data-ft-theme="powershell"] .wrapper,
+:root[data-ft-theme="powershell"] .container,
+:root[data-ft-theme="powershell"] .content-container,
+:root[data-ft-theme="powershell"].ft-chat-route .chat-scroll-view {
+  background: #012456 !important;
+  color: #f2f2f2 !important;
+}
+
+:root[data-ft-theme="powershell"] .custom-nav {
+  background: #071b2f !important;
+  border-bottom-color: #315b7c !important;
+}
+
+:root[data-ft-theme="powershell"] .custom-nav .text-white,
+:root[data-ft-theme="powershell"] .custom-nav .title-main,
+:root[data-ft-theme="powershell"] .custom-nav .search-btn,
+:root[data-ft-theme="powershell"].ft-chat-route .title-main,
+:root[data-ft-theme="powershell"].ft-chat-route .content-container > uni-view:first-child .text-white,
+:root[data-ft-theme="powershell"].ft-chat-route .content-container > uni-view:first-child uni-text,
+:root[data-ft-theme="powershell"].ft-chat-route .main-content,
+:root[data-ft-theme="powershell"].ft-chat-route .content-wrapper,
+:root[data-ft-theme="powershell"].ft-chat-route .welcome-text {
+  color: #f2f2f2 !important;
+}
+
+:root[data-ft-theme="powershell"] .custom-nav .title-en,
+:root[data-ft-theme="powershell"].ft-chat-route .title-en,
+:root[data-ft-theme="powershell"].ft-chat-route .welcome-text .text-white,
+:root[data-ft-theme="powershell"].ft-chat-route .gender-text,
+:root[data-ft-theme="powershell"].ft-chat-route .gender-text-unselected,
+:root[data-ft-theme="powershell"].ft-chat-route .zone-text {
+  color: #9cc2dc !important;
+}
+
+:root[data-ft-theme="powershell"].ft-chat-route .gender-option:hover {
+  background: #103b5f !important;
+}
+
+:root[data-ft-theme="powershell"].ft-chat-route .start-chat-btn,
+:root[data-ft-theme="powershell"].ft-chat-route .btn-content,
+:root[data-ft-theme="powershell"].ft-chat-route .send-btn,
+:root[data-ft-theme="powershell"].ft-chat-route [class*="bg-red"],
+:root[data-ft-theme="powershell"].ft-chat-route [class*="bg-theme"] {
+  border: 1px solid #56d4ff !important;
+  border-radius: 0 !important;
+  background: #0e639c !important;
+  box-shadow: none !important;
+}
+
+:root[data-ft-theme="powershell"].ft-chat-route [class*="text-red"],
+:root[data-ft-theme="powershell"].ft-chat-route [class*="text-theme"] {
+  color: #56d4ff !important;
+}
+
+:root[data-ft-theme="powershell"].ft-chat-route .chat-scroll-view {
+  background-image: linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px) !important;
+  background-size: 100% 24px !important;
+  scrollbar-color: #4c86a8 #012456;
+}
+
+:root[data-ft-theme="powershell"].ft-chat-route .chat-scroll-view::-webkit-scrollbar {
+  width: 12px;
+}
+
+:root[data-ft-theme="powershell"].ft-chat-route .chat-scroll-view::-webkit-scrollbar-track {
+  background: #012456;
+}
+
+:root[data-ft-theme="powershell"].ft-chat-route .chat-scroll-view::-webkit-scrollbar-thumb {
+  border: 3px solid #012456;
+  background: #4c86a8;
+}
+
+:root[data-ft-theme="powershell"].ft-chat-route .chat-status-container {
+  background: #012456 !important;
+  border-bottom-color: #315b7c !important;
+  backdrop-filter: none !important;
+}
+
+:root[data-ft-theme="powershell"].ft-chat-route .chat-status-container > uni-view,
+:root[data-ft-theme="powershell"].ft-chat-route .chat-status-container > view {
+  border-color: #315b7c !important;
+  border-radius: 0 !important;
+  background: #071b2f !important;
+  box-shadow: none !important;
+  color: #f2f2f2 !important;
+}
+
+:root[data-ft-theme="powershell"].ft-chat-route .chat-status-container .tag-title,
+:root[data-ft-theme="powershell"].ft-chat-route .chat-status-container .tag-item {
+  border-radius: 0 !important;
+}
+
+:root[data-ft-theme="powershell"].ft-chat-route .chat-status-container .tag-item {
+  border-color: #315b7c !important;
+  background: #103b5f !important;
+  color: #7fdbca !important;
+}
+
+:root[data-ft-theme="powershell"].ft-chat-route .system-message,
+:root[data-ft-theme="powershell"].ft-chat-route .notice-message {
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: #c7c7c7 !important;
+}
+
+:root[data-ft-theme="powershell"].ft-chat-route .partner-message-bubble,
+:root[data-ft-theme="powershell"].ft-chat-route .message-bubble.partner,
+:root[data-ft-theme="powershell"].ft-chat-route .self-message-bubble,
+:root[data-ft-theme="powershell"].ft-chat-route .message-bubble.self {
+  padding: 7px 10px !important;
+  border-radius: 0 !important;
+  background: rgba(7, 27, 47, 0.72) !important;
+  color: #f2f2f2 !important;
+  box-shadow: none !important;
+}
+
+:root[data-ft-theme="powershell"].ft-chat-route .partner-message-bubble,
+:root[data-ft-theme="powershell"].ft-chat-route .message-bubble.partner {
+  border: 0 !important;
+  border-left: 2px solid #56d4ff !important;
+}
+
+:root[data-ft-theme="powershell"].ft-chat-route .self-message-bubble,
+:root[data-ft-theme="powershell"].ft-chat-route .message-bubble.self {
+  border: 0 !important;
+  border-right: 2px solid #f9f1a5 !important;
+  background: rgba(16, 59, 95, 0.84) !important;
+  color: #ffffff !important;
+}
+
+:root[data-ft-theme="powershell"] .ft-row-partner::before,
+:root[data-ft-theme="powershell"] .ft-row-self::after {
+  padding-top: 7px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+:root[data-ft-theme="powershell"] .ft-row-partner::before {
+  content: "PS>";
+  margin-right: 8px;
+  color: #56d4ff;
+}
+
+:root[data-ft-theme="powershell"] .ft-row-self::after {
+  content: ">";
+  margin-left: 8px;
+  color: #f9f1a5;
+}
+
+:root[data-ft-theme="powershell"].ft-chat-route .chat-bottom-bar,
+:root[data-ft-theme="powershell"].ft-chat-route .message-controls-wrapper {
+  background: #071b2f !important;
+  border-top-color: #315b7c !important;
+}
+
+:root[data-ft-theme="powershell"].ft-chat-route .custom-input-container,
+:root[data-ft-theme="powershell"].ft-chat-route .input-container {
+  border-color: #56d4ff !important;
+  border-radius: 0 !important;
+  background: #012456 !important;
+}
+
+:root[data-ft-theme="powershell"].ft-chat-route .message-input,
+:root[data-ft-theme="powershell"].ft-chat-route uni-input,
+:root[data-ft-theme="powershell"].ft-chat-route uni-textarea,
+:root[data-ft-theme="powershell"].ft-chat-route input,
+:root[data-ft-theme="powershell"].ft-chat-route textarea {
+  border-radius: 0 !important;
+  background: #012456 !important;
+  color: #f2f2f2 !important;
+  caret-color: #f2f2f2 !important;
+}
+
+:root[data-ft-theme="powershell"].ft-chat-route input::placeholder,
+:root[data-ft-theme="powershell"].ft-chat-route textarea::placeholder {
+  color: #9cc2dc !important;
+}
+
+:root[data-ft-theme="powershell"].ft-chat-route .uni-drawer__content,
+:root[data-ft-theme="powershell"].ft-chat-route .uni-modal,
+:root[data-ft-theme="powershell"].ft-chat-route uni-modal {
+  border-color: #315b7c !important;
+  border-radius: 0 !important;
+  background: #071b2f !important;
+  color: #f2f2f2 !important;
+  box-shadow: none !important;
+}
+
+:root[data-ft-theme="powershell"].ft-chat-route .uni-modal__btn_primary {
+  color: #56d4ff !important;
+}
+
+/* VS Code skin */
+:root[data-ft-theme="vscode"] {
+  --ft-titlebar-height: 42px;
+  --ft-bg: #1f1f1f;
+  --ft-panel: #181818;
+  --ft-rail: #181818;
+  --ft-line: #2b2b2b;
+  --ft-text: #cccccc;
+  --ft-muted: #9d9d9d;
+  --ft-green: #4ec9b0;
+  --ft-blue: #0078d4;
+  --ft-blue-soft: #182b3a;
+  --ft-sidebar-active: #0078d4;
+}
+
+:root[data-ft-theme="vscode"] body,
+:root[data-ft-theme="vscode"] #fun-talk-shell,
+:root[data-ft-theme="vscode"] #app {
+  font-family: "Segoe UI", "Microsoft YaHei UI", sans-serif !important;
+  letter-spacing: 0;
+}
+
+:root[data-ft-theme="vscode"] .ft-titlebar {
+  background: #181818;
+  border-bottom-color: #2b2b2b;
+  backdrop-filter: none;
+}
+
+:root[data-ft-theme="vscode"] .ft-brand {
+  align-self: stretch;
+  gap: 9px;
+  margin-left: 0;
+  padding: 0 16px 0 13px;
+  background: #1f1f1f;
+  border-top: 1px solid #0078d4;
+  border-right: 1px solid #2b2b2b;
+}
+
+:root[data-ft-theme="vscode"] .ft-logo {
+  width: 24px;
+  height: 24px;
+  border-radius: 3px;
+  background: #0078d4;
+  color: #ffffff;
+  font-size: 0;
+}
+
+:root[data-ft-theme="vscode"] .ft-logo::before {
+  content: "<>";
+  font-family: Consolas, "Cascadia Code", monospace;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+:root[data-ft-theme="vscode"] .ft-name,
+:root[data-ft-theme="vscode"] .ft-subtitle {
+  display: none;
+}
+
+:root[data-ft-theme="vscode"] .ft-theme-command {
+  display: block;
+  color: #cccccc;
+  font-size: 12px;
+  line-height: 40px;
+  white-space: nowrap;
+}
+
+:root[data-ft-theme="vscode"] .ft-actions button,
+:root[data-ft-theme="vscode"] .ft-window-controls button {
+  border-color: transparent;
+  border-radius: 3px;
+  background: transparent;
+  color: #cccccc;
+}
+
+:root[data-ft-theme="vscode"] .ft-actions button:hover,
+:root[data-ft-theme="vscode"] .ft-window-controls button:hover {
+  background: #2a2d2e;
+  border-color: transparent;
+  color: #ffffff;
+}
+
+:root[data-ft-theme="vscode"] .ft-actions .ft-plugin-mini.active {
+  background: #0078d4;
+  color: #ffffff;
+}
+
+:root[data-ft-theme="vscode"] .ft-sidebar {
+  padding-top: 12px;
+  gap: 10px;
+  background: #181818;
+  border-right-color: #2b2b2b;
+}
+
+:root[data-ft-theme="vscode"] .ft-avatar {
+  border-radius: 3px;
+  background: #0078d4;
+  color: #ffffff;
+}
+
+:root[data-ft-theme="vscode"] .ft-nav {
+  position: relative;
+  width: 100%;
+  border-radius: 0;
+  color: #868686;
+  font-size: 0;
+}
+
+:root[data-ft-theme="vscode"] .ft-nav::before {
+  content: attr(data-ft-vscode-glyph);
+  font-family: "Segoe UI Symbol", "Segoe UI", sans-serif;
+  font-size: 22px;
+  line-height: 1;
+}
+
+:root[data-ft-theme="vscode"] .ft-nav.active,
+:root[data-ft-theme="vscode"] .ft-nav:hover {
+  background: transparent;
+  color: #ffffff;
+}
+
+:root[data-ft-theme="vscode"] .ft-nav.active::after {
+  content: "";
+  position: absolute;
+  top: 5px;
+  bottom: 5px;
+  left: 0;
+  width: 2px;
+  background: #0078d4;
+}
+
+:root[data-ft-theme="vscode"] .ft-session-panel {
+  padding-top: 30px;
+  box-sizing: border-box;
+  background: #181818;
+  border-right-color: #2b2b2b;
+}
+
+:root[data-ft-theme="vscode"] .ft-session-panel::before {
+  content: "EXPLORER";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 30px;
+  padding: 0 14px;
+  color: #bbbbbb;
+  font-size: 11px;
+  line-height: 30px;
+  box-sizing: border-box;
+}
+
+:root[data-ft-theme="vscode"] .ft-search {
+  height: 28px;
+  margin: 7px 10px;
+  border: 1px solid #3c3c3c;
+  border-radius: 2px;
+  background: #242424;
+  color: #9d9d9d;
+}
+
+:root[data-ft-theme="vscode"] .ft-search::before {
+  content: "⌕";
+  margin-right: 7px;
+  color: #cccccc;
+}
+
+:root[data-ft-theme="vscode"] .ft-session {
+  height: 58px;
+  padding: 0 12px;
+  border-left-width: 2px;
+  border-bottom-color: #242424;
+}
+
+:root[data-ft-theme="vscode"] .ft-session.active {
+  background: #37373d;
+  border-left-color: #0078d4;
+}
+
+:root[data-ft-theme="vscode"] .ft-session-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 3px;
+  background: #0e639c;
+  color: #ffffff;
+}
+
+:root[data-ft-theme="vscode"] .ft-session-avatar.muted {
+  background: #3c3c3c;
+  color: #cccccc;
+}
+
+:root[data-ft-theme="vscode"] .ft-session-title,
+:root[data-ft-theme="vscode"] .ft-plugin-title,
+:root[data-ft-theme="vscode"] .ft-plugin-name,
+:root[data-ft-theme="vscode"] .ft-skin-panel {
+  color: #cccccc;
+}
+
+:root[data-ft-theme="vscode"] .ft-session-text,
+:root[data-ft-theme="vscode"] .ft-plugin-subtitle,
+:root[data-ft-theme="vscode"] .ft-plugin-desc,
+:root[data-ft-theme="vscode"] .ft-skin-heading span {
+  color: #9d9d9d;
+}
+
+:root[data-ft-theme="vscode"] .ft-plugin-card {
+  margin: 10px;
+  border-color: #2b2b2b;
+  border-radius: 3px;
+  background: #1f1f1f;
+  box-shadow: none;
+}
+
+:root[data-ft-theme="vscode"] .ft-plugin-status {
+  border-color: #3c3c3c;
+  border-radius: 2px;
+  background: #242424;
+  color: #9d9d9d;
+}
+
+:root[data-ft-theme="vscode"] .ft-plugin-status.active {
+  border-color: #0078d4;
+  background: #182b3a;
+  color: #4ec9b0;
+}
+
+:root[data-ft-theme="vscode"] .ft-switch {
+  border-radius: 2px;
+  background: #3c3c3c;
+}
+
+:root[data-ft-theme="vscode"] .ft-switch span {
+  border-radius: 1px;
+  background: #cccccc;
+  box-shadow: none;
+}
+
+:root[data-ft-theme="vscode"] .ft-switch.active {
+  background: #0078d4;
+}
+
+:root[data-ft-theme="vscode"] .ft-skin-panel {
+  margin: 10px;
+  border-top-color: #2b2b2b;
+}
+
+:root[data-ft-theme="vscode"] .ft-skin-select-wrap {
+  border-color: #3c3c3c;
+  border-radius: 2px;
+  background: #242424;
+}
+
+:root[data-ft-theme="vscode"] .ft-skin-prompt {
+  color: #4ec9b0;
+}
+
+:root[data-ft-theme="vscode"] .ft-skin-select-wrap select,
+:root[data-ft-theme="vscode"] .ft-skin-select-wrap option {
+  background: #242424;
+  color: #cccccc;
+}
+
+:root[data-ft-theme="vscode"] #app,
+:root[data-ft-theme="vscode"] uni-page-body,
+:root[data-ft-theme="vscode"] .wrapper,
+:root[data-ft-theme="vscode"] .container,
+:root[data-ft-theme="vscode"] .content-container,
+:root[data-ft-theme="vscode"].ft-chat-route .chat-scroll-view {
+  background: #1f1f1f !important;
+  color: #cccccc !important;
+}
+
+:root[data-ft-theme="vscode"] .custom-nav {
+  height: var(--ft-native-nav-height) !important;
+  min-height: var(--ft-native-nav-height) !important;
+  background: #181818 !important;
+  border-bottom-color: #2b2b2b !important;
+}
+
+:root[data-ft-theme="vscode"] .custom-nav .text-white,
+:root[data-ft-theme="vscode"] .custom-nav .title-main,
+:root[data-ft-theme="vscode"] .custom-nav .search-btn,
+:root[data-ft-theme="vscode"].ft-chat-route .title-main,
+:root[data-ft-theme="vscode"].ft-chat-route .content-container > uni-view:first-child .text-white,
+:root[data-ft-theme="vscode"].ft-chat-route .content-container > uni-view:first-child uni-text,
+:root[data-ft-theme="vscode"].ft-chat-route .main-content,
+:root[data-ft-theme="vscode"].ft-chat-route .content-wrapper,
+:root[data-ft-theme="vscode"].ft-chat-route .welcome-text {
+  color: #cccccc !important;
+}
+
+:root[data-ft-theme="vscode"] .custom-nav .title-en,
+:root[data-ft-theme="vscode"].ft-chat-route .title-en,
+:root[data-ft-theme="vscode"].ft-chat-route .welcome-text .text-white,
+:root[data-ft-theme="vscode"].ft-chat-route .gender-text,
+:root[data-ft-theme="vscode"].ft-chat-route .gender-text-unselected,
+:root[data-ft-theme="vscode"].ft-chat-route .zone-text {
+  color: #9d9d9d !important;
+}
+
+:root[data-ft-theme="vscode"].ft-chat-route .gender-option:hover {
+  background: #2a2d2e !important;
+}
+
+:root[data-ft-theme="vscode"].ft-chat-route .start-chat-btn,
+:root[data-ft-theme="vscode"].ft-chat-route .btn-content,
+:root[data-ft-theme="vscode"].ft-chat-route .send-btn,
+:root[data-ft-theme="vscode"].ft-chat-route [class*="bg-red"],
+:root[data-ft-theme="vscode"].ft-chat-route [class*="bg-theme"] {
+  border-radius: 2px !important;
+  background: #0078d4 !important;
+  box-shadow: none !important;
+}
+
+:root[data-ft-theme="vscode"].ft-chat-route [class*="text-red"],
+:root[data-ft-theme="vscode"].ft-chat-route [class*="text-theme"] {
+  color: #4fc1ff !important;
+}
+
+:root[data-ft-theme="vscode"].ft-chat-route .chat-scroll-view {
+  background-image: linear-gradient(90deg, #181818 0, #181818 52px, #2b2b2b 53px, #1f1f1f 54px) !important;
+  scrollbar-color: #424242 #1f1f1f;
+}
+
+:root[data-ft-theme="vscode"].ft-chat-route .chat-scroll-view::-webkit-scrollbar {
+  width: 12px;
+}
+
+:root[data-ft-theme="vscode"].ft-chat-route .chat-scroll-view::-webkit-scrollbar-track {
+  background: #1f1f1f;
+}
+
+:root[data-ft-theme="vscode"].ft-chat-route .chat-scroll-view::-webkit-scrollbar-thumb {
+  background: #424242;
+}
+
+:root[data-ft-theme="vscode"].ft-chat-route .chat-container,
+:root[data-ft-theme="vscode"].ft-chat-route .messages-container {
+  font-family: Consolas, "Cascadia Code", "Microsoft YaHei UI", monospace !important;
+}
+
+:root[data-ft-theme="vscode"].ft-chat-route .chat-status-container {
+  background: #1f1f1f !important;
+  border-bottom-color: #2b2b2b !important;
+  backdrop-filter: none !important;
+}
+
+:root[data-ft-theme="vscode"].ft-chat-route .chat-status-container > uni-view,
+:root[data-ft-theme="vscode"].ft-chat-route .chat-status-container > view {
+  border-color: #2b2b2b !important;
+  border-radius: 2px !important;
+  background: #181818 !important;
+  box-shadow: none !important;
+  color: #cccccc !important;
+}
+
+:root[data-ft-theme="vscode"].ft-chat-route .chat-status-container .tag-title,
+:root[data-ft-theme="vscode"].ft-chat-route .chat-status-container .tag-item {
+  border-radius: 2px !important;
+}
+
+:root[data-ft-theme="vscode"].ft-chat-route .chat-status-container .tag-item {
+  border-color: #3c3c3c !important;
+  background: #242424 !important;
+  color: #4ec9b0 !important;
+}
+
+:root[data-ft-theme="vscode"].ft-chat-route .messages-container {
+  padding-left: 34px !important;
+}
+
+:root[data-ft-theme="vscode"] .ft-row-partner,
+:root[data-ft-theme="vscode"] .ft-row-self {
+  position: relative;
+  min-height: 30px;
+}
+
+:root[data-ft-theme="vscode"] .ft-row-partner::before,
+:root[data-ft-theme="vscode"] .ft-row-self::before {
+  position: absolute;
+  left: -31px;
+  top: 7px;
+  width: 22px;
+  color: #858585;
+  font-family: Consolas, "Cascadia Code", monospace;
+  font-size: 12px;
+  text-align: right;
+}
+
+:root[data-ft-theme="vscode"] .ft-row-partner::before {
+  content: "01";
+}
+
+:root[data-ft-theme="vscode"] .ft-row-self::before {
+  content: "02";
+}
+
+:root[data-ft-theme="vscode"].ft-chat-route .partner-message-bubble,
+:root[data-ft-theme="vscode"].ft-chat-route .message-bubble.partner,
+:root[data-ft-theme="vscode"].ft-chat-route .self-message-bubble,
+:root[data-ft-theme="vscode"].ft-chat-route .message-bubble.self {
+  padding: 6px 10px !important;
+  border: 0 !important;
+  border-radius: 2px !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  font-family: Consolas, "Cascadia Code", "Microsoft YaHei UI", monospace !important;
+}
+
+:root[data-ft-theme="vscode"].ft-chat-route .partner-message-bubble,
+:root[data-ft-theme="vscode"].ft-chat-route .message-bubble.partner {
+  color: #9cdcfe !important;
+}
+
+:root[data-ft-theme="vscode"].ft-chat-route .self-message-bubble,
+:root[data-ft-theme="vscode"].ft-chat-route .message-bubble.self {
+  background: #264f78 !important;
+  color: #ce9178 !important;
+}
+
+:root[data-ft-theme="vscode"].ft-chat-route .system-message,
+:root[data-ft-theme="vscode"].ft-chat-route .notice-message {
+  margin-left: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: #6a9955 !important;
+  font-family: Consolas, "Cascadia Code", monospace !important;
+}
+
+:root[data-ft-theme="vscode"].ft-chat-route .chat-bottom-bar,
+:root[data-ft-theme="vscode"].ft-chat-route .message-controls-wrapper {
+  background: #181818 !important;
+  border-top-color: #0078d4 !important;
+}
+
+:root[data-ft-theme="vscode"].ft-chat-route .custom-input-container,
+:root[data-ft-theme="vscode"].ft-chat-route .input-container {
+  border-color: #3c3c3c !important;
+  border-radius: 2px !important;
+  background: #1f1f1f !important;
+}
+
+:root[data-ft-theme="vscode"].ft-chat-route .custom-input-container:focus-within,
+:root[data-ft-theme="vscode"].ft-chat-route .input-container:focus-within {
+  border-color: #0078d4 !important;
+}
+
+:root[data-ft-theme="vscode"].ft-chat-route .message-input,
+:root[data-ft-theme="vscode"].ft-chat-route uni-input,
+:root[data-ft-theme="vscode"].ft-chat-route uni-textarea,
+:root[data-ft-theme="vscode"].ft-chat-route input,
+:root[data-ft-theme="vscode"].ft-chat-route textarea {
+  border-radius: 2px !important;
+  background: #1f1f1f !important;
+  color: #d4d4d4 !important;
+  caret-color: #d4d4d4 !important;
+  font-family: Consolas, "Cascadia Code", "Microsoft YaHei UI", monospace !important;
+}
+
+:root[data-ft-theme="vscode"].ft-chat-route input::placeholder,
+:root[data-ft-theme="vscode"].ft-chat-route textarea::placeholder {
+  color: #858585 !important;
+}
+
+:root[data-ft-theme="vscode"].ft-chat-route .uni-drawer__content,
+:root[data-ft-theme="vscode"].ft-chat-route .uni-modal,
+:root[data-ft-theme="vscode"].ft-chat-route uni-modal {
+  border-color: #3c3c3c !important;
+  border-radius: 3px !important;
+  background: #252526 !important;
+  color: #cccccc !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.36) !important;
+}
+
+:root[data-ft-theme="vscode"].ft-chat-route .uni-modal__btn_primary {
+  color: #4fc1ff !important;
 }
 
 @media (max-width: 1050px) {
@@ -1193,12 +2094,4 @@ uni-page-body,
     padding-right: 12px !important;
   }
 
-  .ft-match-alert {
-    left: 12px;
-    right: 12px;
-    bottom: 72px;
-    width: auto;
-    max-width: none;
-    font-size: 13px;
-  }
 }

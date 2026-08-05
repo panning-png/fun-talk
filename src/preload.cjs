@@ -10,6 +10,50 @@ contextBridge.exposeInMainWorld('funTalkClient', {
 });
 
 window.addEventListener('DOMContentLoaded', () => {
+  const THEME_STORAGE_KEY = 'fun-talk:theme';
+  const DEFAULT_THEME_ID = 'powershell';
+  const THEMES = [
+    { id: 'classic', label: '经典蓝灰', prompt: 'UI', windowTitle: 'Fun Talk' },
+    { id: 'powershell', label: 'PowerShell', prompt: 'PS>', windowTitle: 'PS C:\\FunTalk>' },
+    { id: 'vscode', label: 'VS Code', prompt: '<>', windowTitle: 'fun-talk - Visual Studio Code' }
+  ];
+  const themeIds = new Set(THEMES.map((theme) => theme.id));
+  const restoredThemeId = window.localStorage.getItem(THEME_STORAGE_KEY);
+  let activeThemeId = themeIds.has(restoredThemeId) ? restoredThemeId : DEFAULT_THEME_ID;
+
+  const renderThemeControls = () => {
+    document.querySelectorAll('[data-ft-theme-select]').forEach((select) => {
+      select.value = activeThemeId;
+    });
+
+    document.querySelectorAll('[data-ft-theme-name]').forEach((label) => {
+      const activeTheme = THEMES.find((theme) => theme.id === activeThemeId);
+      label.textContent = activeTheme ? activeTheme.label : activeThemeId;
+    });
+
+    const activeTheme = THEMES.find((theme) => theme.id === activeThemeId);
+    document.querySelectorAll('[data-ft-theme-prompt]').forEach((prompt) => {
+      prompt.textContent = activeTheme ? activeTheme.prompt : '';
+    });
+    document.querySelectorAll('[data-ft-theme-command]').forEach((command) => {
+      command.textContent = activeTheme ? activeTheme.windowTitle : 'Fun Talk';
+    });
+  };
+
+  const applyTheme = (themeId, options = {}) => {
+    activeThemeId = themeIds.has(themeId) ? themeId : DEFAULT_THEME_ID;
+    document.documentElement.dataset.ftTheme = activeThemeId;
+    document.documentElement.style.colorScheme = activeThemeId === 'classic' ? 'light' : 'dark';
+
+    if (options.persist !== false) {
+      window.localStorage.setItem(THEME_STORAGE_KEY, activeThemeId);
+    }
+
+    renderThemeControls();
+  };
+
+  applyTheme(activeThemeId, { persist: false });
+
   const inject = () => {
     if (document.getElementById('fun-talk-style')) return;
 
@@ -29,9 +73,10 @@ window.addEventListener('DOMContentLoaded', () => {
         <div class="ft-drag"></div>
         <div class="ft-brand">
           <div class="ft-logo">F</div>
-          <div>
+          <div class="ft-brand-copy">
             <div class="ft-name">Fun Talk</div>
             <div class="ft-subtitle">瓶子说客户端</div>
+            <div class="ft-theme-command" data-ft-theme-command aria-hidden="true">PS C:\\FunTalk&gt;</div>
           </div>
         </div>
         <div class="ft-actions">
@@ -50,9 +95,9 @@ window.addEventListener('DOMContentLoaded', () => {
       </div>
       <aside class="ft-sidebar" aria-hidden="true">
         <div class="ft-avatar">匿</div>
-        <div class="ft-nav active" data-ft-nav="chat" title="聊天">💬</div>
-        <div class="ft-nav" data-ft-nav="explore" title="探索">🧭</div>
-        <div class="ft-nav" data-ft-nav="settings" title="设置">⚙</div>
+        <div class="ft-nav active" data-ft-nav="chat" data-ft-glyph="&gt;_" data-ft-vscode-glyph="◫" title="聊天">💬</div>
+        <div class="ft-nav" data-ft-nav="explore" data-ft-glyph="ls" data-ft-vscode-glyph="⌕" title="探索">🧭</div>
+        <div class="ft-nav" data-ft-nav="settings" data-ft-glyph="cfg" data-ft-vscode-glyph="⚙" title="设置">⚙</div>
       </aside>
       <section class="ft-session-panel" aria-hidden="true">
         <div class="ft-search">搜索</div>
@@ -85,30 +130,34 @@ window.addEventListener('DOMContentLoaded', () => {
           <div class="ft-plugin-desc">开启后自动匹配；遇到男生会确认离开并继续，匹配到女生后停止。</div>
           <div class="ft-plugin-status" data-ft-plugin-status>未启用</div>
         </div>
+        <div class="ft-skin-panel">
+          <div class="ft-skin-heading">
+            <label for="ft-theme-select">界面皮肤</label>
+            <span data-ft-theme-name>PowerShell</span>
+          </div>
+          <div class="ft-skin-select-wrap">
+            <span class="ft-skin-prompt" data-ft-theme-prompt aria-hidden="true">PS&gt;</span>
+            <select id="ft-theme-select" data-ft-theme-select aria-label="选择界面皮肤">
+              ${THEMES.map((theme) => `<option value="${theme.id}">${theme.label}</option>`).join('')}
+            </select>
+          </div>
+        </div>
       </section>
-      <button class="ft-match-alert" type="button" data-ft-match-alert data-ft-clear-alert="female-match">
-        <span class="ft-match-alert-dot"></span>
-        <span data-ft-match-alert-text>已匹配到女生，点击查看聊天</span>
-      </button>
     `;
 
     document.body.prepend(shell);
-
-    shell.querySelectorAll('[data-ft-window]').forEach((control) => {
-      control.addEventListener('click', (event) => {
-        event.preventDefault();
-        event.stopPropagation();
-
-        if (window.funTalkClient && window.funTalkClient.windowAction) {
-          window.funTalkClient.windowAction(control.getAttribute('data-ft-window'));
-        }
-      });
-    });
 
     shell.addEventListener('click', (event) => {
       const alertTarget = event.target.closest('[data-ft-clear-alert]');
       const button = event.target.closest('[data-ft-nav]');
       const windowButton = event.target.closest('[data-ft-window]');
+
+      if (windowButton) {
+        event.preventDefault();
+        event.stopPropagation();
+        ipcRenderer.send('fun-talk:window-control', windowButton.getAttribute('data-ft-window'));
+        return;
+      }
 
       if (alertTarget) {
         event.preventDefault();
@@ -117,21 +166,10 @@ window.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      if (!window.funTalkClient) return;
-
-      if (windowButton) {
-        event.preventDefault();
-        event.stopPropagation();
-
-        if (window.funTalkClient.windowAction) {
-          window.funTalkClient.windowAction(windowButton.getAttribute('data-ft-window'));
-        }
-
-        return;
-      }
-
       if (button) {
-        window.funTalkClient.nav(button.getAttribute('data-ft-nav'));
+        ipcRenderer.invoke('fun-talk:nav', button.getAttribute('data-ft-nav')).catch((error) => {
+          console.error('[fun-talk] navigation failed:', error.message);
+        });
       }
     });
   };
@@ -194,22 +232,10 @@ window.addEventListener('DOMContentLoaded', () => {
   const renderFemaleMatchAlert = () => {
     document.documentElement.classList.toggle('ft-female-match-alert', autoMatch.femaleMatchAlert);
 
-    const alertText = autoMatch.femaleMatchAlertText || '已匹配到女生，点击查看聊天';
     const sessionText = document.querySelector('[data-ft-session-text]');
-    const alertTextNode = document.querySelector('[data-ft-match-alert-text]');
-    const alertButton = document.querySelector('[data-ft-match-alert]');
 
     if (sessionText) {
       sessionText.textContent = autoMatch.femaleMatchAlert ? '匹配到女生，等待你回复' : '匹配后开始对话';
-    }
-
-    if (alertTextNode) {
-      alertTextNode.textContent = alertText;
-    }
-
-    if (alertButton) {
-      alertButton.setAttribute('aria-hidden', autoMatch.femaleMatchAlert ? 'false' : 'true');
-      alertButton.title = alertText;
     }
   };
 
@@ -451,6 +477,19 @@ window.addEventListener('DOMContentLoaded', () => {
     setAutoMatchStatus(autoMatch.enabled ? autoMatch.status || '已启用' : autoMatch.status || '未启用');
   };
 
+  const bindThemeControls = () => {
+    document.querySelectorAll('[data-ft-theme-select]').forEach((select) => {
+      if (select.dataset.ftBound === '1') return;
+
+      select.dataset.ftBound = '1';
+      select.addEventListener('change', () => {
+        applyTheme(select.value);
+      });
+    });
+
+    renderThemeControls();
+  };
+
   const setViewportVars = () => {
     const width = Math.max(1, Math.round(window.innerWidth || document.documentElement.clientWidth || 1));
     const height = Math.max(1, Math.round(window.innerHeight || document.documentElement.clientHeight || 1));
@@ -530,6 +569,7 @@ window.addEventListener('DOMContentLoaded', () => {
     inject();
     mountShell();
     bindPluginControls();
+    bindThemeControls();
     setViewportVars();
     annotatePage();
     markMessageRows();
@@ -546,6 +586,7 @@ window.addEventListener('DOMContentLoaded', () => {
       annotatePage();
       markMessageRows();
       bindPluginControls();
+      bindThemeControls();
       setAutoMatchStatus(autoMatch.status);
       renderFemaleMatchAlert();
     });
@@ -629,6 +670,13 @@ window.addEventListener('DOMContentLoaded', () => {
     partnerGender: getPartnerGender(),
     paired: isPairedChat(),
     leaveModalOpen: !!getLeaveModal()
+  });
+
+  window.funTalkThemeAudit = () => ({
+    activeThemeId,
+    storedThemeId: window.localStorage.getItem(THEME_STORAGE_KEY),
+    availableThemes: THEMES.map((theme) => ({ ...theme })),
+    rootThemeId: document.documentElement.dataset.ftTheme || ''
   });
 
   boot();

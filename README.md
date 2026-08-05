@@ -86,6 +86,18 @@ npm run dev
 npm run check
 ```
 
+## 界面皮肤
+
+聊天页左侧会话栏底部提供“界面皮肤”选择器，切换后立即生效，并保存在当前 Electron 会话中。
+
+当前皮肤：
+
+- PowerShell：默认皮肤，使用经典控制台蓝、Consolas 等宽字体、命令提示符导航和终端式消息布局。
+- VS Code：使用深色工作台、活动栏、资源管理器式会话栏、编辑器消息行和状态栏配色。
+- 经典蓝灰：保留原有企业聊天客户端界面。
+
+新皮肤在 `src/preload.cjs` 的 `THEMES` 中注册，并在 `src/theme.css` 中以根节点的 `data-ft-theme` 属性作为样式作用域。
+
 ## 文件结构
 
 ```text
